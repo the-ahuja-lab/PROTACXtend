@@ -75,7 +75,7 @@ CAPABILITIES: list[dict[str, str]] = [
         "detail": "PROTACXtend validate --smiles CCO runs RDKit descriptors plus local scoring hooks.",
     },
     {
-        "name": "Feynman-style TUI",
+        "name": "terminal UI",
         "status": "available",
         "detail": "PROTACXtend (no args) or PROTACXtend tui opens a full-screen terminal UI with agent pipeline, model system, and live workflow log.",
     },
@@ -137,7 +137,7 @@ SCENARIOS: list[dict[str, str]] = [
         "name": "tui",
         "command": "PROTACXtend tui",
         "time": "Instant open; design jobs run inside the terminal UI",
-        "use": "Launch the Feynman-style terminal interface with agent pipeline, model system, and live workflow log.",
+        "use": "Launch the terminal interface with agent pipeline, model system, and live workflow log.",
     },
     {
         "name": "ui",
@@ -217,7 +217,7 @@ def _render_banner() -> None:
     body.append("Agentic PROTAC design terminal interface\n", style="bold")
     body.append("On a TTY, ", style="bold")
     body.append("PROTACXtend", style="bold green")
-    body.append(" opens the Feynman-style TUI. In fallback mode:\n")
+    body.append(" opens the terminal UI. In fallback mode:\n")
     body.append("Type a design request, or use slash/backslash commands: ")
     body.append("/help", style="bold cyan")
     body.append(" ")
@@ -311,7 +311,16 @@ def _print_workflow_hint(command: str, request: str = "") -> None:
 
 
 def _interactive_command() -> int:
-    """Launch the Feynman-style TUI when on a TTY, else fallback."""
+    """Launch the terminal UI when on a TTY, else fallback."""
+    # Startup question: which LLM backend (API vs Ollama)?
+    import os as _os
+    from protacxtend.llm.providers import USER_CONFIG_PATH
+    if not _os.environ.get("PROTACPILOT_LLM_PROVIDER") and not USER_CONFIG_PATH.exists():
+        try:
+            from protacxtend.llm.setup import interactive_setup
+            interactive_setup(ask=input, out=print)
+        except Exception as exc:  # never block the UI on setup problems
+            print(f"(llm setup skipped: {exc})")
     if sys.stdin.isatty():
         try:
             from protacxtend.tui.app import launch_tui
@@ -437,7 +446,7 @@ def _interactive_command_fallback() -> int:
             _mode_command("validate", argparse.Namespace(smiles=prompt.removeprefix("/validate ").strip()))
             continue
         if prompt == "/tui":
-            print("Launching Feynman-style TUI...")
+            print("Launching terminal UI...")
             _tui_command(argparse.Namespace(request=[]))
             continue
         if prompt == "/ui":
@@ -541,7 +550,7 @@ def _mode_command(mode: str, args: argparse.Namespace) -> int:
 
 
 def _tui_command(args: argparse.Namespace) -> int:
-    """Launch the Feynman-style terminal UI."""
+    """Launch the terminal UI."""
     try:
         from protacxtend.tui.app import launch_tui
         request = _request_from_parts(args.request) if args.request else None
@@ -620,6 +629,111 @@ def _status_command(args: argparse.Namespace) -> int:
         table.add_row(f"Dependency: {name}", "available" if available else "missing")
     console.print(table)
     return 0
+
+
+
+
+# ── LLM backend + assistant chat ───────────────────────────────────────
+
+def _print_llm_status(out=print) -> None:
+    from protacxtend.llm.setup import read_config
+    info = read_config()
+    h = info["health"]
+    out("")
+    out(f"  provider   {info['provider']}")
+    out(f"  model      {info['model']}")
+    out(f"  base_url   {info['base_url']}")
+    out(f"  api_key    {'set' if info['api_key_set'] else 'not set'}")
+    out(f"  health     {'OK (' + str(h.get('n_models')) + ' models visible)' if h.get('ok') else 'UNREACHABLE: ' + str(h.get('error', ''))}")
+    if info.get("config_file"):
+        out(f"  config     {info['config_file']}")
+    out("")
+
+
+def _llm_command(args: argparse.Namespace) -> int:
+    from protacxtend.llm.providers import get_config
+    if getattr(args, "setup", False):
+        from protacxtend.llm.setup import interactive_setup
+        interactive_setup(ask=input, out=print)
+        _print_llm_status()
+        return 0
+    if args.provider or args.model or args.base_url or args.api_key:
+        from protacxtend.llm.setup import apply_config
+        try:
+            apply_config(provider=args.provider or get_config().provider,
+                         model=args.model or "",
+                         base_url=args.base_url or "",
+                         api_key=args.api_key or "")
+        except ValueError as exc:
+            print(f"llm: {exc}")
+            return 1
+    _print_llm_status()
+    return 0
+
+
+def _chat_command(args: argparse.Namespace) -> int:
+    import os
+    from protacxtend.llm import chat_client as cc
+    from protacxtend.llm.providers import get_config
+
+    # Startup question: if nothing is configured yet, ask API vs Ollama.
+    from protacxtend.llm.providers import USER_CONFIG_PATH
+    if not os.environ.get("PROTACPILOT_LLM_PROVIDER") and not USER_CONFIG_PATH.exists():
+        from protacxtend.llm.setup import interactive_setup
+        interactive_setup(ask=input, out=print)
+
+    cfg = get_config()
+    message = " ".join(getattr(args, "message", None) or [])
+
+    if message:
+        print(cc.backend_banner(cfg))
+        print("")
+        cc.chat_one_shot(message, on_delta=lambda d: print(d, end="", flush=True))
+        print("\n")
+        return 0
+
+    history = [{"role": "system", "content": cc.SYSTEM_PROMPT}]
+    print("")
+    print("  PROTACXtend assistant — " + cc.backend_banner(cfg))
+    print("  type an objective or question · /llm switch backend · /clear · /status · /help · /exit")
+    print("")
+    while True:
+        try:
+            line = input("PROTACXtend> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nbye")
+            return 0
+        if not line:
+            continue
+        cmd = line.lower()
+        if cmd in ("/exit", "/quit", "exit", "quit"):
+            return 0
+        if cmd in ("/clear", "clear"):
+            history = history[:1]
+            print("(context cleared)")
+            continue
+        if cmd in ("/status", "status"):
+            _print_llm_status()
+            continue
+        if cmd in ("/help", "help", "?"):
+            print("  /llm    choose backend (API or Ollama)")
+            print("  /clear  reset conversation context")
+            print("  /status show active provider + health")
+            print("  /exit   leave")
+            continue
+        if cmd in ("/llm", "llm"):
+            from protacxtend.llm.setup import interactive_setup
+            interactive_setup(ask=input, out=print)
+            cfg = get_config()
+            print("  → " + cc.backend_banner(cfg))
+            continue
+        history.append({"role": "user", "content": line})
+        print("")
+        answer = cc.stream_text(history, cfg=cfg, on_delta=lambda d: print(d, end="", flush=True))
+        print("\n")
+        history.append({"role": "assistant", "content": answer})
+        if len(history) > 40:
+            history = history[:1] + history[-18:]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -714,7 +828,7 @@ def build_parser() -> argparse.ArgumentParser:
     contract.add_argument("--evidence-cutoff-date", default="")
     contract.set_defaults(func=lambda args: _mode_command("contract", args))
 
-    tui = sub.add_parser("tui", help="Launch the Feynman-style terminal UI.")
+    tui = sub.add_parser("tui", help="Launch the terminal UI.")
     tui.add_argument("request", nargs="*", help="Optional design request to run immediately.")
     tui.set_defaults(func=_tui_command)
 
@@ -729,6 +843,19 @@ def build_parser() -> argparse.ArgumentParser:
     api.add_argument("--port", type=int, default=8001)
     api.add_argument("--reload", action="store_true")
     api.set_defaults(func=_api_command)
+
+    llm = sub.add_parser("llm", help="Configure or inspect the LLM backend (API vs Ollama).")
+    llm.add_argument("--setup", action="store_true", help="Interactive backend picker (API or Ollama).")
+    llm.add_argument("--status", action="store_true", help="Show active backend and health.")
+    llm.add_argument("--provider", default="", help="Provider: ollama|openai|openrouter|anthropic|google|openai_compatible")
+    llm.add_argument("--model", default="")
+    llm.add_argument("--base-url", default="")
+    llm.add_argument("--api-key", default="")
+    llm.set_defaults(func=_llm_command)
+
+    chat = sub.add_parser("chat", help="Pi-style assistant chat with the configured LLM backend.")
+    chat.add_argument("message", nargs="*", help="Optional one-shot question; omit for an interactive chat.")
+    chat.set_defaults(func=_chat_command)
 
     status = sub.add_parser("status", help="Show local PROTACXtend runtime status.")
     status.add_argument("--json", action="store_true")
@@ -748,6 +875,8 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     command_names = {
         "run",
+        "llm",
+        "chat",
         "design",
         "ask",
         "validate",
