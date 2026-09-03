@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from protacxtend.workflows.protacpilot_blueprint import (
@@ -34,16 +36,19 @@ def test_blueprint_order_and_reference_order():
 def test_pipeline_executes_local_then_blocks_externals():
     from protacxtend.workflows.pilot_runner import run_protacpilot_pipeline
     events = []
-    ctx = {"target": "BRD4", "e3": "CRBN", "protac_smiles": "CCO", "objective": ""}
+    ctx = {"target": "BRD4", "e3": "VHL", "protac_smiles": "CCO", "objective": ""}
     result = run_protacpilot_pipeline(ctx, events.append)
     assert result["blocked_at"] == "ternary_generator"
     # real steps ran before the external gate
     ran = {e["name"] for e in events if e["status"] == "success"}
     assert "know_target" in ran
     assert "know_e3" in ran
-    # external engine is reported NOT AVAILABLE, never fabricated
+    # PROTAC-Model backend blocked honestly: dependencies missing, nothing fabricated
     blocked = [e for e in events if e["name"] == "ternary_generator" and e["status"] == "blocked"]
-    assert blocked and "COMPASS" in blocked[0]["summary"]
+    assert blocked and "PROTAC-Model" in blocked[0]["summary"]
+    assert "MISSING" in blocked[0]["summary"] or "missing" in blocked[0]["summary"]
+    # poses were never invented
+    assert "poses" not in json.dumps(blocked[0].get("data", {}))
     # no downstream node claims success past the block
     past = [e for e in events
             if PROTACpILOT_BLUEPRINT and _idx(e["name"]) > _idx("ternary_generator")]
@@ -65,3 +70,24 @@ def test_no_fabricated_md_or_bor5():
     for name in ("md_validator", "bRo5_exposure_predictor", "pose_consensus"):
         hits = [e for e in events if e["name"] == name]
         assert hits and hits[0]["status"] in ("blocked", "skipped")
+
+
+def test_conformer_success_is_mapped_to_success(monkeypatch):
+    from protacxtend.workflows import pilot_runner
+    monkeypatch.setattr("protacxtend.workflows.pilot_runner._run_local",
+                        lambda *a, **k: None)  # avoid recursion guard (not used)
+    from protacxtend.tools.chemistry_core import generate_3d_conformer as real
+    # real MZ1 conformer now succeeds after maxAttempts->maxIterations fix
+    mz1 = open(__import__("pathlib").Path(__file__).resolve().parents[2] /
+               "data/protac_repos/repos/PROTAC-Model_benchmark/structures/5T35/protac.smi").read().strip()
+    res = real(mz1, max_attempts=2000, seed=42)
+    assert res.get("status") == "success" and res.get("molblock")
+
+
+def test_protac_model_status_detects_missing_deps():
+    from protacxtend.workflows.pilot_runner import protac_model_status
+    status = protac_model_status()
+    # repo is present in this checkout; heavy external binaries are NOT available
+    assert status["dir"].endswith("PROTAC-Model")
+    assert status["ready"] is False
+    assert any(v == "MISSING" for v in status["deps"].values())

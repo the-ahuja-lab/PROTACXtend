@@ -12,6 +12,8 @@ nodes are skipped with a clear explanation.
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from protacxtend.workflows.protacpilot_blueprint import PROTACpILOT_BLUEPRINT
@@ -75,10 +77,15 @@ def _run_local(node: Dict[str, Any], ctx: Dict[str, Any]) -> Dict[str, Any]:
         smiles = ctx.get("protac_smiles")
         if not smiles:
             return {"status": "blocked", "summary": "no SMILES for conformer generation"}
-        res = generate_3d_conformer(smiles, max_attempts=50)
-        return {"status": "success" if res.get("ok") or res.get("success") else "warning",
-                "summary": "3D conformer generated" if res.get("ok") or res.get("success")
-                else "conformer generation warning", "data": res}
+        res = generate_3d_conformer(smiles, max_attempts=1000, seed=61453)
+        if res.get("status") == "success" and res.get("molblock"):
+            return {"status": "success", "summary": "3D conformer generated (RDKit ETKDG)",
+                    "data": {"molblock_chars": len(res["molblock"]),
+                             "conformer_id": res.get("conformer_id")}}
+        return {"status": "blocked", "summary": f"conformer generation failed · {res.get('error')}",
+                "data": res}
+    if engine == "protac_model":
+        return run_protac_model(ctx)
     if engine == "predict_cooperativity":
         from protacxtend.tools.cooperativity_alpha_tool import run_cooperativity_predictor
         try:
@@ -92,6 +99,92 @@ def _run_local(node: Dict[str, Any], ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "blocked",
                 "summary": "lysine proximity requires a ternary pose from a configured ternary engine"}
     return {"status": "blocked", "summary": f"no local implementation for '{engine}'"}
+
+
+
+# ── PROTAC-Model real backend (native outputs + provenance; never fabricated) ──
+
+_REQUIRED_BIN_ENV = {
+    "python2": None, "ADFRsuite": "ADFRSUITE", "frodock": "FRODOCK",
+    "voromqa": "VOROMQA", "fcc": "FCC", "Rosetta": "ROSETTA",
+}
+_OPTIONAL_BIN_ENV = {"vina": "VINA"}
+
+
+def _which(name: str) -> Optional[str]:
+    import shutil
+    return shutil.which(name)
+
+
+def _protac_model_dir() -> Optional[Any]:
+    env = os.environ.get("PROTACXTEND_PROTAC_MODEL_DIR", "").strip()
+    if env:
+        cand = Path(env)
+        return cand if (cand / "main.py").exists() else None
+    from pathlib import Path as _P
+    cand = _P(__file__).resolve().parents[2] / "data" / "protac_repos" / "repos" / "PROTAC-Model"
+    return cand if (cand / "main.py").exists() else None
+
+
+def protac_model_status() -> Dict[str, Any]:
+    """Per-dependency availability report (no execution)."""
+    import os as _os
+    report: Dict[str, Any] = {"dir": str(_protac_model_dir() or ""), "deps": {}}
+    for label, envvar in _REQUIRED_BIN_ENV.items():
+        found = _which(label)
+        if found is None and envvar:
+            found = _os.environ.get(envvar)
+        report["deps"][label] = "present" if found else "MISSING"
+    report["ready"] = report["dir"] != "" and all(v == "present" for v in report["deps"].values())
+    return report
+
+
+def run_protac_model(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    """Run PROTAC-Model main.py with benchmark 5T35/MZ1 inputs when every
+    dependency exists. Returns native outputs + provenance; never fabricates."""
+    status = protac_model_status()
+    if status["dir"] == "":
+        return {"status": "blocked", "summary": "PROTAC-Model repo not found (set PROTACXTEND_PROTAC_MODEL_DIR)"}
+    missing = [k for k, v in status["deps"].items() if v != "present"]
+    if missing:
+        return {"status": "blocked",
+                "summary": ("PROTAC-Model dependencies missing: " + ", ".join(missing) +
+                            ". Install ADFRsuite/FRODOCK/VOROMQA/FCC/Rosetta(+MPI) and set env "
+                            "vars ADFRSUITE/FRODOCK/VOROMQA/FCC/ROSETTA (see repo README). "
+                            "NOT AVAILABLE — no result fabricated."),
+                "deps": status["deps"]}
+    site = (ctx.get("site") or os.environ.get("PROTAC_MODEL_SITE", "")).strip()
+    if not site:
+        return {"status": "blocked",
+                "summary": "PROTAC-Model ready but docking site (-site X,Y,Z) not provided "
+                           "(set PROTAC_MODEL_SITE or ctx site).",
+                "deps": status["deps"]}
+    # 5T35/MZ1 smoke inputs (receptor=larger complex, target=BRD4, crystal=5t35_AD)
+    bench = (Path(status["dir"]).parents[1] / "PROTAC-Model_benchmark" / "structures" / "5T35")
+    inputs = ctx.get("smoke_inputs") or {}
+    rec = inputs.get("receptor") or str(bench / "receptor.pdb")
+    tgt = inputs.get("target") or str(bench / "target.pdb")
+    smi = inputs.get("smiles") or str(bench / "protac.smi")
+    out = Path(ctx.get("output_dir") or (bench.parent / "output" / "protac_model_run"))
+    out.mkdir(parents=True, exist_ok=True)
+    cmd = ["python2", str(Path(status["dir"]) / "main.py"),
+           "-irec", rec, "-ilig", tgt, "-site", site, "-ismi", smi, "-o", str(out), "-cpu", "1"]
+    import subprocess as _sp, time as _time
+    started = _time.time()
+    try:
+        proc = _sp.run(cmd, capture_output=True, text=True, timeout=7200)
+        poses = sorted(str(p) for p in out.rglob("*.pdb"))
+        return {"status": "success" if proc.returncode == 0 and poses else "error",
+                "summary": f"PROTAC-Model finished rc={proc.returncode} · {len(poses)} pose PDB(s)",
+                "data": {"returncode": proc.returncode, "poses": poses,
+                         "stdout_tail": (proc.stdout or "")[-800:],
+                         "stderr_tail": (proc.stderr or "")[-800:],
+                         "output_dir": str(out), "runtime_s": round(_time.time() - started, 1)},
+                "provenance": {"command": cmd, "deps": status["deps"],
+                               "model": "PROTAC-Model", "repo": status["dir"]}}
+    except Exception as exc:
+        return {"status": "error", "summary": f"PROTAC-Model execution error · {exc}",
+                "runtime_s": round(_time.time() - started, 1)}
 
 
 def run_protacpilot_pipeline(
