@@ -1,5 +1,10 @@
 # PROTACXtend
 
+<p align="center">
+  <img src="website/assets/PROTACXtend.png" alt="PROTACXtend — evidence-grounded autonomous research system for targeted protein degradation" width="840">
+</p>
+
+
 [![Live site](https://img.shields.io/badge/⚗%EF%B8%8F%20PROTACXtend-github.io-%23706BD6?style=flat-square&labelColor=%230B1338)](https://the-ahuja-lab.github.io/PROTACXtend/)
 [![CI](https://img.shields.io/github/actions/workflow/status/the-ahuja-lab/PROTACXtend/ci.yml?style=flat-square&label=CI&labelColor=%230B1338&color=%23706BD6)](https://github.com/the-ahuja-lab/PROTACXtend/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-%23706BD6?style=flat-square&labelColor=%230B1338)](LICENSE)
