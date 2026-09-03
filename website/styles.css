@@ -829,7 +829,7 @@ button { font-family: inherit; }
 @media (max-width: 1080px) {
   .hero-copy { max-width: 860px; }
   .hero-side { align-items: center; }
-  .hero-figure { width: 100%; max-width: 680px; }
+  .hero-art { width: 100%; max-width: 680px; margin-inline: auto; }
   .hero-note { margin-inline: auto; }
   .krdd-grid { grid-template-columns: repeat(2, 1fr); }
   .about-layout { grid-template-columns: 1fr; gap: 34px; }
@@ -932,3 +932,9 @@ html { overflow-x: hidden; }
 }
 .fig-caption .badge { font-size: 11px; padding: 4px 11px; }
 .fig-caption-tag { background: linear-gradient(90deg, #625CC6, #4E47B2); }
+
+/* hero visual — authored PROTACXtend hero image */
+.hero-art { display: block; margin: 0; }
+.hero-art img { display: block; width: 100%; height: auto;
+  border-radius: 18px; border: 1px solid var(--border); background: #fff;
+  box-shadow: 0 26px 64px -30px rgba(11,19,56,.3); }
