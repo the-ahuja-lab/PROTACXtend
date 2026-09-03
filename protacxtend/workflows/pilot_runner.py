@@ -139,12 +139,91 @@ def protac_model_status() -> Dict[str, Any]:
     return report
 
 
+
+def _read_atoms(pdb: Path) -> Dict[str, List[Dict[str, float]]]:
+    """chain -> list of atom dicts {x,y,z} from ATOM/HETATM records."""
+    chains: Dict[str, List[Dict[str, float]]] = {}
+    for line in pdb.read_text(errors="ignore").splitlines():
+        if line.startswith(("ATOM", "HETATM")):
+            try:
+                x = float(line[30:38]); y = float(line[38:46]); z = float(line[46:54])
+            except ValueError:
+                continue
+            chains.setdefault(line[21], []).append({"x": x, "y": y, "z": z})
+    return chains
+
+
+def derive_site_from_crystal(crystal: Path, target_chain: str = "A",
+                             receptor_chain: str = "D", cutoff_angstrom: float = 8.0,
+                             ) -> Optional[Dict[str, Any]]:
+    """Interface centre of the receptor chain near the target chain in the
+    crystal complex — the docking site for PROTAC-Model protein-protein
+    docking. Pure coordinate geometry; no model inference."""
+    chains = _read_atoms(crystal)
+    target = chains.get(target_chain, [])
+    receptor = chains.get(receptor_chain, [])
+    if not target or not receptor:
+        return None
+    interface = []
+    for r in receptor:
+        rx, ry, rz = r["x"], r["y"], r["z"]
+        for t in target:
+            dx, dy, dz = rx - t["x"], ry - t["y"], rz - t["z"]
+            if dx * dx + dy * dy + dz * dz <= cutoff_angstrom * cutoff_angstrom:
+                interface.append(r)
+                break
+    if not interface:
+        return None
+    n = len(interface)
+    site = {
+        "x": round(sum(a["x"] for a in interface) / n, 2),
+        "y": round(sum(a["y"] for a in interface) / n, 2),
+        "z": round(sum(a["z"] for a in interface) / n, 2),
+        "n_interface_atoms": n,
+        "target_chain": target_chain, "receptor_chain": receptor_chain,
+        "crystal": str(crystal), "source": "derived_from_crystal_interface",
+    }
+    return site
+
+
+def protac_model_requirements() -> str:
+    """Exact install/activation requirements (never installs anything)."""
+    lines = [
+        "PROTAC-Model runtime requirements (see data/protac_repos/repos/PROTAC-Model/README):",
+        "  1. python2 ................ present (/usr/bin/python2)",
+        "  2. RDKit (py2-compatible) . required by repo utils",
+        "  3. ADFRsuite ................ ccsb.scripps.edu/adfr - set ADFRSUITE=<dir>",
+        "  4. FRODOCK ................... chaconlab.org/modeling/frodock - set FRODOCK=<dir>",
+        "  5. VOROMQA .................. github.com/kliment-olechnovic/voronota - set VOROMQA=<dir>",
+        "  6. FCC ...................... github.com/haddocking/fcc - set FCC=<dir>",
+        "  7. Rosetta (license) ........ rosettacommons.org (MPI build) - set ROSETTA=<dir>",
+        "  8. Vina ..................... present (/usr/bin/vina)",
+        "  9. Docking site ............. auto-derived from crystal 5t35_AD (or set PROTAC_MODEL_SITE)",
+    ]
+    return "\n".join(lines)
+
+
 def run_protac_model(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """Run PROTAC-Model main.py with benchmark 5T35/MZ1 inputs when every
     dependency exists. Returns native outputs + provenance; never fabricates."""
     status = protac_model_status()
+    bench = (Path(status["dir"]).parent / "PROTAC-Model_benchmark" / "structures" / "5T35") \
+        if status["dir"] else None
+
+    # Derive the docking site from the crystal up front (pure geometry; provenance kept).
+    site = (ctx.get("site") or os.environ.get("PROTAC_MODEL_SITE", "")).strip()
+    site_provenance = None
+    if not site and bench is not None:
+        crystal = bench / "5t35_AD.pdb"
+        if crystal.exists():
+            derived = derive_site_from_crystal(crystal)
+            if derived:
+                site = f"{derived['x']},{derived['y']},{derived['z']}"
+                site_provenance = derived
+
     if status["dir"] == "":
-        return {"status": "blocked", "summary": "PROTAC-Model repo not found (set PROTACXTEND_PROTAC_MODEL_DIR)"}
+        return {"status": "blocked",
+                "summary": "PROTAC-Model repo not found (set PROTACXTEND_PROTAC_MODEL_DIR)"}
     missing = [k for k, v in status["deps"].items() if v != "present"]
     if missing:
         return {"status": "blocked",
@@ -152,15 +231,15 @@ def run_protac_model(ctx: Dict[str, Any]) -> Dict[str, Any]:
                             ". Install ADFRsuite/FRODOCK/VOROMQA/FCC/Rosetta(+MPI) and set env "
                             "vars ADFRSUITE/FRODOCK/VOROMQA/FCC/ROSETTA (see repo README). "
                             "NOT AVAILABLE — no result fabricated."),
-                "deps": status["deps"]}
-    site = (ctx.get("site") or os.environ.get("PROTAC_MODEL_SITE", "")).strip()
+                "deps": status["deps"],
+                "data": {"derived_site": site_provenance or site,
+                         "requirements": protac_model_requirements()}}
     if not site:
         return {"status": "blocked",
-                "summary": "PROTAC-Model ready but docking site (-site X,Y,Z) not provided "
-                           "(set PROTAC_MODEL_SITE or ctx site).",
+                "summary": "PROTAC-Model ready but docking site (-site X,Y,Z) could not be "
+                           "derived from crystal (set PROTAC_MODEL_SITE or ctx site).",
                 "deps": status["deps"]}
     # 5T35/MZ1 smoke inputs (receptor=larger complex, target=BRD4, crystal=5t35_AD)
-    bench = (Path(status["dir"]).parents[1] / "PROTAC-Model_benchmark" / "structures" / "5T35")
     inputs = ctx.get("smoke_inputs") or {}
     rec = inputs.get("receptor") or str(bench / "receptor.pdb")
     tgt = inputs.get("target") or str(bench / "target.pdb")
@@ -181,7 +260,8 @@ def run_protac_model(ctx: Dict[str, Any]) -> Dict[str, Any]:
                          "stderr_tail": (proc.stderr or "")[-800:],
                          "output_dir": str(out), "runtime_s": round(_time.time() - started, 1)},
                 "provenance": {"command": cmd, "deps": status["deps"],
-                               "model": "PROTAC-Model", "repo": status["dir"]}}
+                               "model": "PROTAC-Model", "repo": status["dir"],
+                               "site": site_provenance or site}}
     except Exception as exc:
         return {"status": "error", "summary": f"PROTAC-Model execution error · {exc}",
                 "runtime_s": round(_time.time() - started, 1)}

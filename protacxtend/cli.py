@@ -808,8 +808,14 @@ def _pilot_command(args: argparse.Namespace) -> int:
     print("")
     print(f"PROTACpilot pipeline: {result['status']}")
     print(f"  steps executed: {len(result['results'])}")
+    if getattr(args, "requirements", False):
+        from protacxtend.workflows.pilot_runner import protac_model_requirements
+        print(protac_model_requirements())
     if result.get("blocked_at"):
-        print(f"  blocked at: {result['blocked_at']} (external engine not configured — NOT AVAILABLE, no fabrication)")
+        detail = "NOT AVAILABLE — no fabrication"
+        if result["blocked_at"] == "ternary_generator":
+            detail += " · PROTAC-Model deps required (add --requirements for exact install steps)"
+        print(f"  blocked at: {result['blocked_at']} ({detail})")
     return 0
 
 
@@ -926,6 +932,7 @@ def build_parser() -> argparse.ArgumentParser:
     pilot.add_argument("--target", default="", help="Target, e.g. BRD4")
     pilot.add_argument("--e3", default="CRBN", help="E3 ligase, e.g. CRBN")
     pilot.add_argument("--smiles", default="", help="PROTAC/Warhead SMILES for decomposer/conformers")
+    pilot.add_argument("--requirements", action="store_true", help="Print PROTAC-Model install requirements.")
     pilot.set_defaults(func=_pilot_command)
 
     runtime = sub.add_parser("runtime", help="Inspect the Pi runtime (status).")

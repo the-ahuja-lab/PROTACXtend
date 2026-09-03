@@ -91,3 +91,23 @@ def test_protac_model_status_detects_missing_deps():
     assert status["dir"].endswith("PROTAC-Model")
     assert status["ready"] is False
     assert any(v == "MISSING" for v in status["deps"].values())
+
+
+def test_derive_site_5t35_from_crystal():
+    from pathlib import Path
+    from protacxtend.workflows.pilot_runner import derive_site_from_crystal
+    crystal = Path(__file__).resolve().parents[2] / "data/protac_repos/repos" / \
+        "PROTAC-Model_benchmark" / "structures" / "5T35" / "5t35_AD.pdb"
+    site = derive_site_from_crystal(crystal)
+    assert site is not None
+    assert isinstance(site["x"], float) and isinstance(site["y"], float)
+    assert site["source"] == "derived_from_crystal_interface"
+
+
+def test_blocked_response_carries_derived_site():
+    from protacxtend.workflows.pilot_runner import run_protac_model
+    r = run_protac_model({"target": "BRD4", "e3": "VHL"})
+    assert r["status"] == "blocked"
+    derived = r.get("data", {}).get("derived_site")
+    assert derived is not None and derived.get("x")
+    assert "requirements" in r.get("data", {})
