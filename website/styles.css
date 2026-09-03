@@ -949,3 +949,40 @@ html { overflow-x: hidden; }
 @media (max-width: 640px) {
   .hero-title { margin-top: 18px; }
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   Hero v2.6 — bigger, decluttered, centered
+   Copy on top (centered), hero artwork below at full width so the
+   image's side details stay legible; capability loop flattened.
+   ════════════════════════════════════════════════════════════════════ */
+.hero { padding: 62px 0 30px; }
+.hero-inner { position: relative; display: block; }
+.hero-copy { max-width: 960px; margin-inline: auto; text-align: center; }
+.hero-title { max-width: 920px; margin-inline: auto; font-size: clamp(33px, 3.8vw, 56px); }
+.hero-lede { max-width: 70ch; margin-inline: auto; }
+.loop-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 20px;
+  max-width: 920px; margin: 30px auto 6px; text-align: left; }
+.loop-card { padding: 4px 0 2px; border: none; background: transparent;
+  box-shadow: none; border-radius: 0; }
+.loop-card::before { display: none; }
+.loop-card:hover { transform: none; box-shadow: none; }
+.loop-idx { color: var(--pale); padding-top: 1px; }
+.hero-ctas { justify-content: center; }
+.hero-art { margin: 34px auto 0; width: 100%; max-width: 1040px; }
+.hero-note { max-width: 660px; margin: 20px auto 0; }
+@media (max-width: 1080px) {
+  .hero-inner { display: block; }
+  .loop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 720px; }
+  .hero-art { max-width: min(100%, 920px); }
+}
+@media (max-width: 640px) {
+  .hero { padding: 42px 0 24px; }
+  .loop-grid { gap: 14px 12px; }
+  .hero-art { margin-top: 24px; }
+  .hero-note { margin-top: 16px; }
+}
+
+/* v2.6b — capability strip sits beneath the hero artwork */
+.loop-grid { margin: 34px auto 0; }
+.hero-note { margin-top: 28px; }
+.hero-art { margin-top: 36px; }
