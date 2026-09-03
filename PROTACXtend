@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# PROTACXtend — Pi-backed launcher.
+# Keeps the caller's working directory as the Pi workspace; never cd's.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-exec python -m protacxtend.cli "$@"
+export PROTACXTEND_ROOT="$SCRIPT_DIR"
+export PYTHONPATH="$SCRIPT_DIR${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m protacxtend.cli "$@"
