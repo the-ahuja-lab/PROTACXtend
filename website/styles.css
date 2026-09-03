@@ -935,6 +935,17 @@ html { overflow-x: hidden; }
 
 /* hero visual — authored PROTACXtend hero image */
 .hero-art { display: block; margin: 0; }
-.hero-art img { display: block; width: 100%; height: auto;
-  border-radius: 18px; border: 1px solid var(--border); background: #fff;
-  box-shadow: 0 26px 64px -30px rgba(11,19,56,.3); }
+.hero-art img, .hero-art source { display: block; }
+.hero-art img { width: 100%; height: auto; background: #fff;
+  border-radius: 16px; box-shadow: 0 24px 48px -28px rgba(11,19,56,.28); }
+
+/* Impeccable craft-floor pass v2.5 — states, focus, spacing cadence */
+.btn:focus-visible, .nav-link:focus-visible, .nav-brand:focus-visible,
+.copy-btn:focus-visible, .tab-pill:focus-visible, .quickstart-bar a:focus-visible {
+  outline: 2px solid #625CC6; outline-offset: 2px; }
+.hero-title { margin-top: 22px; margin-bottom: 16px; }
+.loop-grid { margin-top: 28px; }
+.hero-lede { max-width: 66ch; }
+@media (max-width: 640px) {
+  .hero-title { margin-top: 18px; }
+}

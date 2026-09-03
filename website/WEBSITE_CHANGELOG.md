@@ -2,6 +2,13 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.5 — hero image → AA.png + Impeccable craft/colorize/optimize/clarify/layout pass (2026-09-03)
+
+- Hero visual now uses `assets/AA.png` (1672×941, 16:9); superseded `assets/hero.png` removed.
+- `optimize`: added a responsive `<picture>` with an optimized **WebP** (1440w, 122 KB vs 1.96 MB PNG ≈ 16× smaller), `fetchpriority="high"` + `<link rel=preload>` + explicit width/height for LCP/CLS.
+- `colorize`/`craft-floor`: hero image elevation simplified to one soft offset shadow (no border+shadow ghost card), radius 16px; hero note copy tightened (“A research system, not a demo…”); visible `:focus-visible` states for all hero/nav controls; spacing cadence tuned (more space above the headline than below, lede measure capped at ~66ch).
+- No layout/overflow regressions at 320–1920px.
+
 ## v2.4 — hero visual swapped to authored image (2026-09-03)
 
 - Replaced the inline SVG mechanism cartoon in the hero with the authored 16:9 hero illustration `website/assets/hero.png` (1672×941), shown cleanly on the right side of the two-column hero (rounded, subtle border/shadow; stacked + centred below the copy on ≤1080px).
