@@ -410,7 +410,10 @@ def generate_3d_conformer(smiles: str, max_attempts: int = 1000, seed: int = 614
         mol_h = Chem.AddHs(mol)
         params = AllChem.ETKDGv3()
         params.randomSeed = int(seed)
-        params.maxAttempts = int(max_attempts)
+        if hasattr(params, "maxAttempts"):
+            params.maxAttempts = int(max_attempts)
+        elif hasattr(params, "maxIterations"):   # RDKit >= 2024 removed maxAttempts
+            params.maxIterations = int(max(50, max_attempts))
         conformer_id = int(AllChem.EmbedMolecule(mol_h, params))
         if conformer_id < 0:
             return {"smiles": smiles, "status": "failed", "conformer_id": conformer_id, "molblock": None, "error": "RDKit ETKDG embedding failed."}
