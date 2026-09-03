@@ -2,6 +2,10 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.10 — footer: single solid dark color (2026-09-03)
+
+- Footer set to one solid dark tone (#14131F, neutral charcoal with a faint violet cast — no navy, no gradient); light text/lavender accents, white brand tile kept larger. Rest of the page stays light.
+
 ## v2.9 — header tidy-up, light footer, bigger footer brand (2026-09-03)
 
 - Header: removed the “v0.3 core · research” version chip; replaced the long KNOW·REASON·DESIGN·DISCOVER nav item with the single word **Capabilities** (same anchor).
