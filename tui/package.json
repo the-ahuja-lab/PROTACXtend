@@ -1,7 +1,7 @@
 {
   "name": "@protacxtend/tui",
-  "version": "0.1.0",
-  "description": "PROTACXtend Feynman-style terminal UI",
+  "version": "0.3.0",
+  "description": "PROTACXtend \u201cLaboratory Night\u201d terminal command centre \u2014 dependency-free Node TUI for evidence-grounded PROTAC design (JSONL bridge to the Python agent graph).",
   "license": "MIT",
   "type": "module",
   "engines": {
