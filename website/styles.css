@@ -2,7 +2,7 @@
    PROTACXtend — Design System
    Signature: gradient #8683DD → #706BD6 on Dark Navy #0B1338
    Palette:
-     Dark Navy #0B1338 · Deep Blue #0F2280 · Primary Purple #706BD6
+     Dark Navy #0B1338 · Deep Blue #3E3786 · Primary Purple #706BD6
      Light Purple #8683DD · Cyan #5AB9CD · Teal #1792A2
      Background #F8F8FE · Soft Panel #F6F7FD · Border #E2E7F4
      Pale Accent #BABDEE
@@ -12,8 +12,8 @@
 
 :root {
   /* PROTACXtend ink & accent core */
-  --navy:        #0B1338;
-  --deep-blue:   #0F2280;
+  --navy:        #191B2B;
+  --deep-blue:   #3E3786;
   --purple:      #706BD6;
   --light-purple:#8683DD;
   --cyan:        #5AB9CD;
@@ -27,7 +27,7 @@
   --pale:        #BABDEE;
 
   /* text */
-  --ink:         #0B1338;
+  --ink:         #171920;
   --ink-soft:    #39405F;
   --ink-muted:   #656E92;
   --ink-faint:   #9AA1C2;
@@ -37,10 +37,10 @@
   --grad-soft:   linear-gradient(135deg, rgba(134,131,221,.14), rgba(90,185,205,.10));
   --grad-chip:   linear-gradient(90deg, #8683DD, #706BD6);
 
-  --shadow-xs:   0 1px 2px rgba(11,19,56,.05);
-  --shadow-sm:   0 4px 14px -6px rgba(11,19,56,.10);
+  --shadow-xs:   0 1px 2px rgba(24,25,38,.05);
+  --shadow-sm:   0 4px 14px -6px rgba(24,25,38,.10);
   --shadow-md:   0 14px 34px -14px rgba(23,37,110,.18);
-  --shadow-lg:   0 30px 60px -24px rgba(11,19,56,.24);
+  --shadow-lg:   0 30px 60px -24px rgba(24,25,38,.24);
   --shadow-purple: 0 18px 44px -18px rgba(112,107,214,.45);
 
   --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-pill: 999px;
@@ -121,7 +121,7 @@ button { font-family: inherit; }
 .btn-github-nav {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 13px; font-weight: 600; color: #fff;
-  background: linear-gradient(120deg, #706BD6, #0F2280);
+  background: linear-gradient(120deg, #706BD6, #3E3786);
   padding: 9px 16px; border-radius: var(--r-pill);
   box-shadow: var(--shadow-purple);
   transition: transform .2s var(--ease), box-shadow .2s var(--ease);
@@ -160,7 +160,7 @@ button { font-family: inherit; }
 }
 .hero-title em {
   font-style: italic; font-weight: 500;
-  background: linear-gradient(115deg, #706BD6 10%, #0F2280 55%, #1792A2 95%);
+  background: linear-gradient(115deg, #706BD6 10%, #3E3786 55%, #1792A2 95%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero-lede { font-size: 17px; line-height: 1.75; color: var(--ink-soft); max-width: 560px; font-weight: 400; }
@@ -174,7 +174,7 @@ button { font-family: inherit; }
   transition: transform .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
 }
 .btn:active { transform: scale(.98); }
-.btn-primary { color: #fff; background: linear-gradient(120deg, #8683DD, #706BD6 55%, #0F2280 160%); box-shadow: var(--shadow-purple); }
+.btn-primary { color: #fff; background: linear-gradient(120deg, #8683DD, #706BD6 55%, #3E3786 160%); box-shadow: var(--shadow-purple); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 24px 46px -16px rgba(112,107,214,.6); }
 .btn-ghost { color: var(--deep-blue); background: var(--card); border-color: var(--border); box-shadow: var(--shadow-xs); }
 .btn-ghost:hover { border-color: var(--pale); background: var(--panel); transform: translateY(-2px); }
@@ -213,7 +213,7 @@ button { font-family: inherit; }
   position: relative;
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--r-lg); overflow: hidden;
-  box-shadow: 0 26px 64px -30px rgba(11,19,56,.3);
+  box-shadow: 0 26px 64px -30px rgba(24,25,38,.3);
 }
 .fig-topbar {
   display: flex; align-items: center; gap: 7px;
@@ -267,7 +267,7 @@ button { font-family: inherit; }
 }
 .sec-title em {
   font-style: italic;
-  background: linear-gradient(115deg, #706BD6, #0F2280);
+  background: linear-gradient(115deg, #706BD6, #3E3786);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .sec-desc { font-size: 16.5px; color: var(--ink-soft); line-height: 1.75; }
@@ -539,7 +539,7 @@ button { font-family: inherit; }
   border: 1px solid rgba(186,189,238,.2);
 }
 .docs-pane pre code { font-family: inherit; color: inherit; background: none; }
-.docs-pane .json-pre { background: #0F2280; }
+.docs-pane .json-pre { background: #3E3786; }
 .doc-inline { font-style: italic; color: var(--ink-muted) !important; }
 .ep-row { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 13.5px; color: var(--ink-soft); }
 .ep {
@@ -550,7 +550,7 @@ button { font-family: inherit; }
 /* ═══════════ CTA ═══════════ */
 .cta-band {
   position: relative; overflow: hidden;
-  background: linear-gradient(115deg, #0B1338 0%, #0F2280 55%, #706BD6 140%);
+  background: linear-gradient(115deg, #0B1338 0%, #3E3786 55%, #706BD6 140%);
   padding: 90px 0;
 }
 .cta-band::before {
@@ -566,7 +566,7 @@ button { font-family: inherit; }
 .cta-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
 
 /* ═══════════ FOOTER ═══════════ */
-.footer { background: #060A1E; color: rgba(248,248,254,.72); padding: 70px 0 28px; }
+.footer { background: #161226; color: rgba(248,248,254,.72); padding: 70px 0 28px; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 46px; }
 .footer-brand .nav-brand { margin-bottom: 14px; }
 .footer-brand p { font-size: 13.5px; line-height: 1.75; color: rgba(248,248,254,.55); margin-top: 14px; max-width: 320px; }
@@ -646,9 +646,9 @@ button { font-family: inherit; }
 .loop-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 .loop-card:focus-visible { outline: 2px solid rgba(112,107,214,.6); outline-offset: 2px; }
 .loop-know::before    { background: linear-gradient(90deg, #1792A2, #5AB9CD); }
-.loop-reason::before  { background: linear-gradient(90deg, #0F2280, #706BD6); }
+.loop-reason::before  { background: linear-gradient(90deg, #3E3786, #706BD6); }
 .loop-design::before  { background: linear-gradient(90deg, #706BD6, #8683DD); }
-.loop-discover::before { background: linear-gradient(90deg, #8683DD, #0F2280); }
+.loop-discover::before { background: linear-gradient(90deg, #8683DD, #3E3786); }
 .loop-idx { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--ink-faint);
   letter-spacing: .4px; padding-top: 3px; }
 .loop-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -657,7 +657,7 @@ button { font-family: inherit; }
 .loop-reason .loop-title { color: var(--deep-blue); }
 .loop-design .loop-title { color: var(--purple); }
 .loop-discover .loop-title { color: transparent;
-  background: linear-gradient(90deg, #8683DD, #0F2280 75%, #1792A2);
+  background: linear-gradient(90deg, #8683DD, #3E3786 75%, #1792A2);
   -webkit-background-clip: text; background-clip: text; }
 .loop-desc { font-size: 10.5px; line-height: 1.5; color: var(--ink-muted); }
 
@@ -906,17 +906,17 @@ html { overflow-x: hidden; }
   -webkit-background-clip: initial; background-clip: initial;
   -webkit-text-fill-color: currentColor; }
 .footer .brand-accent { color: #BABDEE; }
-.hero-title em { color: #0F2280; background: none;
+.hero-title em { color: #3E3786; background: none;
   -webkit-background-clip: initial; background-clip: initial;
   -webkit-text-fill-color: currentColor; }
-.loop-discover .loop-title { color: #0F2280; background: none;
+.loop-discover .loop-title { color: #3E3786; background: none;
   -webkit-background-clip: initial; background-clip: initial;
   -webkit-text-fill-color: currentColor; }
 .kicker { color: #5B4FC4; }
 .loop-design .loop-title { color: #5B4FC4; }
 .brand-chip { font-size: 11px; color: #5B4FC4;
   border-color: rgba(91,79,196,.35); background: rgba(91,79,196,.08); }
-.btn-primary, .btn-github-nav { background: linear-gradient(120deg, #625CC6 0%, #4E47B2 55%, #0F2280 130%); }
+.btn-primary, .btn-github-nav { background: linear-gradient(120deg, #625CC6 0%, #4E47B2 55%, #3E3786 130%); }
 .btn-primary { box-shadow: 0 18px 40px -18px rgba(15,34,128,.38); }
 .btn-github-nav { box-shadow: 0 14px 30px -16px rgba(15,34,128,.40); }
 .loop-idx { font-size: 11px; color: #626B94; }
@@ -937,7 +937,7 @@ html { overflow-x: hidden; }
 .hero-art { display: block; margin: 0; }
 .hero-art img, .hero-art source { display: block; }
 .hero-art img { width: 100%; height: auto; background: #fff;
-  border-radius: 16px; box-shadow: 0 24px 48px -28px rgba(11,19,56,.28); }
+  border-radius: 16px; box-shadow: 0 24px 48px -28px rgba(24,25,38,.28); }
 
 /* Impeccable craft-floor pass v2.5 — states, focus, spacing cadence */
 .btn:focus-visible, .nav-link:focus-visible, .nav-brand:focus-visible,
@@ -986,3 +986,40 @@ html { overflow-x: hidden; }
 .loop-grid { margin: 34px auto 0; }
 .hero-note { margin-top: 28px; }
 .hero-art { margin-top: 36px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   End-of-page tone pass — single violet family, no navy/cyan ending
+   ════════════════════════════════════════════════════════════════════ */
+.cta-band {
+  background:
+    radial-gradient(130% 220% at 12% 0%, rgba(134,131,221,.28), transparent 55%),
+    radial-gradient(120% 180% at 88% 100%, rgba(112,107,214,.18), transparent 60%),
+    linear-gradient(125deg, #3D3690 0%, #2B2569 52%, #1B1740 120%);
+}
+.cta-band::before { display: none; }
+.cta-band h2 em {
+  color: #CFCBF8; background: none;
+  -webkit-background-clip: initial; background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+}
+.cta-band .kicker-light { color: #D9D6FA; }
+.footer { background: #161226; }
+.footer-col h5 { color: #B9B4EF; }
+
+/* single-tone pass: remaining dark-blue surfaces -> deep violet family */
+.hero-stats {
+  background:
+    linear-gradient(120deg, rgba(134,131,221,.16), transparent 42%),
+    radial-gradient(ellipse 40% 90% at 88% 0%, rgba(112,107,214,.20), transparent),
+    linear-gradient(120deg, #241F55 0%, #161229 100%);
+  border-color: rgba(186,189,238,.22);
+}
+.hero-stats::before { background: linear-gradient(90deg, #8683DD, #625CC6); }
+.stat-num { color: #DDDAFB; background: none;
+  -webkit-background-clip: initial; background-clip: initial;
+  -webkit-text-fill-color: currentColor; }
+.stat-lab { color: rgba(248,248,254,.72); }
+.mech-chain { background: linear-gradient(120deg, #241F55 0%, #161229 100%);
+  border-color: rgba(186,189,238,.20); }
+.release-card { background: linear-gradient(140deg, #282262 0%, #1B1740 100%);
+  border-color: rgba(186,189,238,.22); }
