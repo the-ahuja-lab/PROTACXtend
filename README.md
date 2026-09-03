@@ -11,13 +11,6 @@
 
 PROTACXtend is a local, tool-augmented AI agent platform for component-aware PROTAC design, ternary complex feasibility modeling, and degradation prediction.
 
-- **Live website**: [`the-ahuja-lab.github.io/PROTACXtend`](https://the-ahuja-lab.github.io/PROTACXtend/) (GitHub Pages — hero overview, capabilities, mechanisms, model panel, validation matrix, workflows, walkthrough & docs)
-- **GitHub Repository**: [`the-ahuja-lab/PROTACXtend`](https://github.com/the-ahuja-lab/PROTACXtend)
-- **Organization**: Ahuja Lab ([@the-ahuja-lab](https://github.com/the-ahuja-lab))
-- **Lead Developer**: Saveena Solanki ([@SaveenaSolanki](https://github.com/SaveenaSolanki))
-- **Web App source**: [`website/`](website/index.html) — pure static landing page, interactive simulator & documentation hub (no build step)
-- **Documentation**: [`documentation/`](documentation/README.md) — installation, architecture (23-node core + 8 extensions = 31 documented nodes), workflows, API reference, and GitHub collaborator setup.
-
 The system takes a natural-language design objective, converts it into a structured workflow state, and runs a governed agent graph — a 23-node core scientific workflow plus 8 controlled-search/feedback extensions (31 documented nodes; status source of truth: `config/scientific_status.yaml`) — to build candidate PROTAC records, score them with deterministic tools, mechanistic modules and ML models, rank candidates, and output reports, CSV and JSON data. Every executed step records its input, output, evidence source, model version and limitation.
 
 Quick start: [documentation/GETTING_STARTED.md](documentation/GETTING_STARTED.md) · workflows: [documentation/WORKFLOWS.md](documentation/WORKFLOWS.md) · status source of truth: [`config/scientific_status.yaml`](config/scientific_status.yaml).
@@ -443,14 +436,11 @@ python scripts/deep_research_cli.py "PROTAC BRD4 degradation cancer" --no-llm
 
 ## Tests
 
-Run the focused workflow test:
 
-```bash
-python3 -m unittest protacxtend.tests.test_workflow
 ```
-
-Run the main test suite:
-
-```bash
-python3 -m pytest tests protacxtend/tests
-```
+- **Live website**: [`the-ahuja-lab.github.io/PROTACXtend`](https://the-ahuja-lab.github.io/PROTACXtend/) (GitHub Pages — hero overview, capabilities, mechanisms, model panel, validation matrix, workflows, walkthrough & docs)
+- **GitHub Repository**: [`the-ahuja-lab/PROTACXtend`](https://github.com/the-ahuja-lab/PROTACXtend)
+- **Organization**: Ahuja Lab ([@the-ahuja-lab](https://github.com/the-ahuja-lab))
+- **Lead Developer**: Saveena Solanki ([@SaveenaSolanki](https://github.com/SaveenaSolanki))
+- **Web App source**: [`website/`](website/index.html) — pure static landing page, interactive simulator & documentation hub (no build step)
+- **Documentation**: [`documentation/`](documentation/README.md) — installation, architecture (23-node core + 8 extensions = 31 documented nodes), workflows, API reference, and GitHub collaborator setup.
