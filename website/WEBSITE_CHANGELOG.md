@@ -2,6 +2,11 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.9 — header tidy-up, light footer, bigger footer brand (2026-09-03)
+
+- Header: removed the “v0.3 core · research” version chip; replaced the long KNOW·REASON·DESIGN·DISCOVER nav item with the single word **Capabilities** (same anchor).
+- Footer: recolored from dark violet to a **light** footer (soft lavender-grey gradient + top border, ink text) matching the rest of the page; brand lockup enlarged (logo mark ~46px tile + larger wordmark).
+
 ## v2.8 — remove the pre-footer CTA band (single footer) (2026-09-03)
 
 - Deleted the dark CTA section that sat directly above the real footer — it read as a second footer. The page now ends with the single `<footer>`.
