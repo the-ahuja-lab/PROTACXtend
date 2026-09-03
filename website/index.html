@@ -12,6 +12,7 @@
   <meta property="og:image" content="assets/og-cover.png">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/png" href="assets/logo-square.png">
+  <link rel="preload" as="image" href="assets/AA.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 </head>
@@ -125,12 +126,15 @@
 
         <div class="hero-side reveal">
                   <figure class="hero-art">
-          <img src="assets/hero.png" alt="PROTACXtend — evidence-grounded autonomous research system for targeted protein degradation" width="1672" height="941">
+          <picture>
+            <source type="image/webp" srcset="assets/AA.webp">
+            <img src="assets/AA.png" alt="PROTACXtend research-system overview — evidence retrieval, component-aware molecular design, ternary-complex reasoning and degradation prediction" width="1672" height="941" decoding="async" fetchpriority="high">
+          </picture>
         </figure>
 
           <p class="hero-note">
-            <strong>This is a research system, not a demo</strong> — every stage runs with its own
-            tools, models and an explicit evidence type. Walkthrough values are illustrative unless
+            <strong>A research system, not a demo</strong> — every stage runs with its own tools,
+            models and an explicit evidence type, and walkthrough values are illustrative unless
             marked otherwise.
           </p>
         </div>
