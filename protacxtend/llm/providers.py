@@ -23,6 +23,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol
 
 logger = logging.getLogger("protacpilot.llm.providers")
@@ -34,7 +35,7 @@ logger = logging.getLogger("protacpilot.llm.providers")
 class ProviderConfig:
     provider: str = "ollama"
     model: str = "gpt-oss:20b"
-    base_url: str = "http://127.0.0.1:11435"     # ollama server
+    base_url: str = "http://127.0.0.1:11434"     # ollama server
     api_key: str = ""
     num_ctx: int = 16384
     temperature: float = 0.0
@@ -53,12 +54,35 @@ class ProviderConfig:
         )
 
 
+# ── Persistent user config (~/.protacxtend/llm.json) ──────────────────
+USER_CONFIG_PATH = Path(os.environ.get("PROTACXTEND_HOME", "~/.protacxtend")).expanduser() / "llm.json"
+
+
+def load_user_config() -> Optional["ProviderConfig"]:
+    """Saved provider choice (written by `protacxtend llm setup`). None if absent."""
+    try:
+        if USER_CONFIG_PATH.exists():
+            data = json.loads(USER_CONFIG_PATH.read_text())
+            keys = ("provider", "model", "base_url", "api_key", "num_ctx", "temperature", "timeout_s")
+            return ProviderConfig(**{k: data[k] for k in keys if k in data})
+    except Exception as exc:  # pragma: no cover - best-effort read
+        logger.warning("could not read %s: %s", USER_CONFIG_PATH, exc)
+    return None
+
+
 # Runtime override (set via backend API); None = use env config
 _runtime_config: Optional[ProviderConfig] = None
 
 
 def get_config() -> ProviderConfig:
-    return _runtime_config or ProviderConfig.from_env()
+    if _runtime_config is not None:
+        return _runtime_config
+    if os.environ.get("PROTACPILOT_LLM_PROVIDER"):      # explicit env wins
+        return ProviderConfig.from_env()
+    saved = load_user_config()                            # `protacxtend llm setup`
+    if saved is not None:
+        return saved
+    return ProviderConfig.from_env()
 
 
 def set_runtime_config(config: ProviderConfig) -> None:
@@ -89,31 +113,35 @@ class LLMProvider(Protocol):
 # ── Ollama (local) ────────────────────────────────────────────────────
 
 class OllamaProvider:
+    """Ollama via its HTTP API (no python `ollama` package required)."""
     name = "ollama"
 
+    def _host(self, config) -> str:
+        base = config.base_url or "http://127.0.0.1:11434"
+        if not base.startswith("http"):
+            base = f"http://{base}"
+        return base.rstrip("/")
+
     def chat_raw(self, system, user, schema_json, config):
-        import ollama
-        client = ollama.Client(host=config.base_url if config.base_url.startswith("http") else f"http://{config.base_url}")
-        resp = client.chat(
-            model=config.model,
-            messages=[{"role": "system", "content": system},
-                      {"role": "user", "content": user}],
-            format=schema_json,                       # native schema enforcement
-            options={"temperature": config.temperature,
-                     "num_ctx": config.num_ctx},
-        )
-        return resp.message.content
+        import requests
+        payload = {
+            "model": config.model,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": user}],
+            "format": schema_json,                    # native schema enforcement
+            "options": {"temperature": config.temperature, "num_ctx": config.num_ctx},
+        }
+        resp = requests.post(self._host(config) + "/api/chat", json=payload,
+                             timeout=config.timeout_s)
+        resp.raise_for_status()
+        return resp.json().get("message", {}).get("content", "")
 
     def list_models(self, config):
-        import ollama
-        client = ollama.Client(host=config.base_url if config.base_url.startswith("http") else f"http://{config.base_url}")
+        import requests
         try:
-            names = []
-            for m in client.list().get("models", []):
-                name = m.get("name") or m.get("model") or ""
-                if name:
-                    names.append(name)
-            return names
+            resp = requests.get(self._host(config) + "/api/tags", timeout=5)
+            resp.raise_for_status()
+            return [m.get("name") or m.get("model") for m in resp.json().get("models", [])]
         except Exception:
             return []
 
@@ -121,56 +149,55 @@ class OllamaProvider:
 # ── OpenAI + OpenAI-compatible (OpenRouter, vLLM, Groq, DeepSeek, ...) ─
 
 class OpenAICompatibleProvider:
+    """OpenAI + every /v1-compatible endpoint via HTTP (requests only)."""
     name = "openai_compatible"
 
+    def _base(self, config) -> str:
+        base = (config.base_url or "https://api.openai.com/v1").rstrip("/")
+        return base if base.endswith("/chat/completions") else base + "/chat/completions"
+
+    def _headers(self, config) -> dict:
+        headers = {"Content-Type": "application/json"}
+        if config.api_key:
+            headers["Authorization"] = f"Bearer {config.api_key}"
+        return headers
+
     def chat_raw(self, system, user, schema_json, config):
-        from openai import OpenAI
-        client = OpenAI(
-            api_key=config.api_key or "sk-no-key",
-            base_url=config.base_url or None,
-            timeout=config.timeout_s,
-        )
-        # Best-effort structured output: JSON schema if the endpoint supports
-        # it; json_object fallback; the gateway always validates locally.
-        response_format: Optional[Dict[str, Any]] = None
-        if config.base_url and ("vllm" in config.base_url or "groq" in config.base_url.lower()):
-            response_format = {"type": "json_object"}
-        else:
-            response_format = {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "structured_decision",
-                    "schema": schema_json,
-                    "strict": False,
-                },
-            }
+        import requests
+        payload = {
+            "model": config.model,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": user}],
+            "temperature": config.temperature,
+        }
+        url = self._base(config)
         try:
-            resp = client.chat.completions.create(
-                model=config.model,
-                messages=[{"role": "system", "content": system},
-                          {"role": "user", "content": user}],
-                temperature=config.temperature,
-                response_format=response_format,
-            )
-        except Exception as exc:
+            resp = requests.post(url, json={**payload, "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": "structured_decision", "schema": schema_json, "strict": False},
+            }}, headers=self._headers(config), timeout=config.timeout_s)
+            if resp.status_code >= 400 and "response_format" in resp.text:
+                raise RuntimeError("response_format rejected")
+            resp.raise_for_status()
+        except Exception:
             # Retry without response_format (some endpoints reject schema)
-            if "response_format" in str(exc) or "json_schema" in str(exc):
-                resp = client.chat.completions.create(
-                    model=config.model,
-                    messages=[{"role": "system", "content": system + " Reply with JSON only."},
-                              {"role": "user", "content": user}],
-                    temperature=config.temperature,
-                )
-            else:
-                raise
-        return resp.choices[0].message.content or ""
+            resp = requests.post(url, json={**payload, "messages": [{"role": "system", "content": system + " Reply with JSON only."},
+                                                                    {"role": "user", "content": user}],
+                                            "temperature": config.temperature},
+                                 headers=self._headers(config), timeout=config.timeout_s)
+            resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"] or ""
 
     def list_models(self, config):
-        from openai import OpenAI
-        client = OpenAI(api_key=config.api_key or "sk-no-key",
-                        base_url=config.base_url or None)
+        import requests
         try:
-            return [m.id for m in client.models.list().data]
+            base = config.base_url or "https://api.openai.com/v1"
+            base = base.rstrip("/")
+            if base.endswith("/chat/completions"):
+                base = base[: -len("/chat/completions")]
+            resp = requests.get(base + "/models", headers=self._headers(config), timeout=10)
+            resp.raise_for_status()
+            return [m["id"] for m in resp.json().get("data", [])]
         except Exception:
             return []
 
