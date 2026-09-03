@@ -1023,3 +1023,27 @@ html { overflow-x: hidden; }
   border-color: rgba(186,189,238,.20); }
 .release-card { background: linear-gradient(140deg, #282262 0%, #1B1740 100%);
   border-color: rgba(186,189,238,.22); }
+
+/* ════════════════════════════════════════════════════════════════════
+   v2.9 — header tidy-up + light footer with a bigger brand lockup
+   ════════════════════════════════════════════════════════════════════ */
+.footer {
+  background: linear-gradient(180deg, #F8F8FD 0%, #EFEFF9 100%);
+  border-top: 1px solid var(--border);
+  color: var(--ink-soft);
+}
+.footer-brand p { color: var(--ink-muted); }
+.footer-col h5 { color: #5B4FC4; }
+.footer-col a { color: var(--ink-soft); }
+.footer-col a:hover { color: #3E3786; transform: translateX(3px); }
+.footer .brand-accent { color: #5B4FC4; }
+.footer-brand .brand-logo img {
+  height: 46px; padding: 7px 9px; border-radius: 12px;
+  background: #fff; border: 1px solid var(--border);
+  box-shadow: 0 12px 26px -16px rgba(24,25,38,.35);
+}
+.footer-brand .nav-brand { gap: 13px; }
+.footer-brand .brand-word { font-size: 22px; letter-spacing: .2px; }
+.footer-base { border-top: 1px solid var(--border); color: var(--ink-muted); }
+.footer-base a { color: var(--purple); }
+.footer-base a:hover { color: #3E3786; text-decoration: underline; }
