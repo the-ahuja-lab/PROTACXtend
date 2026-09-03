@@ -1,7 +1,7 @@
 # PROTACXtend
 
 <p align="center">
-  <img src="website/assets/PROTACXtend.png" alt="PROTACXtend — evidence-grounded autonomous research system for targeted protein degradation" width="840">
+  <img src="https://github.com/the-ahuja-lab/PROTACXtend/blob/main/git_hero.png" alt="PROTACXtend — evidence-grounded autonomous research system for targeted protein degradation" width="840">
 </p>
 
 
