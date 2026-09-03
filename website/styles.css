@@ -1047,3 +1047,24 @@ html { overflow-x: hidden; }
 .footer-base { border-top: 1px solid var(--border); color: var(--ink-muted); }
 .footer-base a { color: var(--purple); }
 .footer-base a:hover { color: #3E3786; text-decoration: underline; }
+
+/* v2.10 — footer: single solid dark (overrides v2.9 light footer) */
+.footer {
+  background: #14131F;
+  border-top: none;
+  color: rgba(248, 248, 254, 0.8);
+}
+.footer .brand-word { color: #F4F3FC; }
+.footer .brand-accent { color: #B9B3EF; }
+.footer-brand p { color: rgba(248, 248, 254, 0.55); }
+.footer-col h5 { color: #A9A4EA; }
+.footer-col a { color: rgba(248, 248, 254, 0.72); }
+.footer-col a:hover { color: #FFFFFF; transform: translateX(3px); }
+.footer-brand .brand-logo img {
+  height: 46px; padding: 7px 9px; border-radius: 12px;
+  background: #fff; border: none;
+  box-shadow: 0 12px 26px -16px rgba(0, 0, 0, 0.5);
+}
+.footer-base { border-top: 1px solid rgba(186, 189, 238, 0.14); color: rgba(248, 248, 254, 0.42); }
+.footer-base a { color: #A9A4EA; }
+.footer-base a:hover { color: #FFFFFF; text-decoration: underline; }
