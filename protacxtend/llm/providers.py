@@ -131,10 +131,24 @@ class OllamaProvider:
             "format": schema_json,                    # native schema enforcement
             "options": {"temperature": config.temperature, "num_ctx": config.num_ctx},
         }
+        # Some Ollama builds stream by default; handle both one-shot JSON and NDJSON.
         resp = requests.post(self._host(config) + "/api/chat", json=payload,
-                             timeout=config.timeout_s)
+                             timeout=config.timeout_s, stream=True)
         resp.raise_for_status()
-        return resp.json().get("message", {}).get("content", "")
+        chunks = []
+        for line in resp.iter_lines(decode_unicode=True):
+            if not line:
+                continue
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            content = (data.get("message") or {}).get("content") or ""
+            if content:
+                chunks.append(content)
+            if data.get("done"):
+                break
+        return "".join(chunks)
 
     def list_models(self, config):
         import requests

@@ -672,30 +672,56 @@ def _llm_command(args: argparse.Namespace) -> int:
 
 
 def _chat_command(args: argparse.Namespace) -> int:
+    """Pi-style conversational scientific agent (tools → graph handoff)."""
     import os
-    from protacxtend.llm import chat_client as cc
-    from protacxtend.llm.providers import get_config
+    from protacxtend.agentic.chat_agent import ConversationalAgent, ClarificationNeeded
+    from protacxtend.agentic.registry import TOOL_SPECS
+    from protacxtend.llm.providers import USER_CONFIG_PATH, get_config
 
-    # Startup question: if nothing is configured yet, ask API vs Ollama.
-    from protacxtend.llm.providers import USER_CONFIG_PATH
     if not os.environ.get("PROTACPILOT_LLM_PROVIDER") and not USER_CONFIG_PATH.exists():
         from protacxtend.llm.setup import interactive_setup
         interactive_setup(ask=input, out=print)
 
     cfg = get_config()
-    message = " ".join(getattr(args, "message", None) or [])
+    agent = ConversationalAgent(cfg)
 
+    def banner() -> str:
+        from protacxtend.llm.chat_client import backend_banner
+        return backend_banner(cfg)
+
+    def print_run(run) -> None:
+        for ev in run.events:
+            print("  " + ev.render())
+
+    def finish(run, newline=True) -> None:
+        print_run(run)
+        k = (run.summary or {}).get("kind")
+        if k == "answer":
+            print("\n" + str(run.summary.get("answer", "")))
+        elif k == "handoff":
+            print("\n" + str(run.summary.get("answer", "")))
+        elif k == "clarification":
+            print("\n" + str(run.summary.get("question", "")))
+        elif k == "error":
+            print("\n[error] " + str(run.summary.get("error", "unknown")))
+
+    def fresh_agent() -> None:
+        nonlocal agent
+        agent = ConversationalAgent(get_config())
+
+    message = " ".join(getattr(args, "message", None) or [])
     if message:
-        print(cc.backend_banner(cfg))
-        print("")
-        cc.chat_one_shot(message, on_delta=lambda d: print(d, end="", flush=True))
-        print("\n")
+        try:
+            run = agent.turn(message, ask=None if not sys.stdin.isatty() else input)
+        except ClarificationNeeded as need:
+            print("\nACTION REQUIRED — " + need.question)
+            return 2
+        finish(run)
         return 0
 
-    history = [{"role": "system", "content": cc.SYSTEM_PROMPT}]
     print("")
-    print("  PROTACXtend assistant — " + cc.backend_banner(cfg))
-    print("  type an objective or question · /llm switch backend · /clear · /status · /help · /exit")
+    print("  PROTACXtend agent — " + banner())
+    print("  ask scientifically · /llm switch backend · /tools · /agents · /status · /clear · /help · /exit")
     print("")
     while True:
         try:
@@ -705,35 +731,59 @@ def _chat_command(args: argparse.Namespace) -> int:
             return 0
         if not line:
             continue
-        cmd = line.lower()
-        if cmd in ("/exit", "/quit", "exit", "quit"):
+        low = line.lower()
+        if low in ("/exit", "/quit", "exit", "quit"):
             return 0
-        if cmd in ("/clear", "clear"):
-            history = history[:1]
-            print("(context cleared)")
+        if low in ("/clear", "clear"):
+            fresh_agent()
+            print("(session cleared)")
             continue
-        if cmd in ("/status", "status"):
-            _print_llm_status()
+        if low in ("/help", "help", "?"):
+            print("  /llm /model set NAME   switch backend / model (shared config)")
+            print("  /tools                 show the strict tool registry")
+            print("  /agents                deterministic specialist agents (under the graph)")
+            print("  /run <objective>       force a full workflow handoff")
+            print("  /status                active provider + health")
+            print("  /clear /exit           session controls")
             continue
-        if cmd in ("/help", "help", "?"):
-            print("  /llm    choose backend (API or Ollama)")
-            print("  /clear  reset conversation context")
-            print("  /status show active provider + health")
-            print("  /exit   leave")
-            continue
-        if cmd in ("/llm", "llm"):
+        if low in ("/llm", "/model"):
             from protacxtend.llm.setup import interactive_setup
             interactive_setup(ask=input, out=print)
-            cfg = get_config()
-            print("  → " + cc.backend_banner(cfg))
+            fresh_agent()
+            print("  → " + banner())
             continue
-        history.append({"role": "user", "content": line})
+        if low.startswith("/model set ") or low.startswith("/models set "):
+            name = line.split("set", 1)[1].strip()
+            from protacxtend.llm.setup import apply_config
+            try:
+                apply_config(provider=cfg.provider, model=name)
+                fresh_agent()
+                print("  → model set to " + name)
+            except Exception as exc:
+                print("  model set failed: " + str(exc))
+            continue
+        if low in ("/models", "model") or low == "/model status":
+            _print_llm_status()
+            continue
+        if low in ("/tools", "tools"):
+            for sp in TOOL_SPECS:
+                print(f"  {sp['name']:<28} [{sp['readiness']}] {sp['kind']} · {sp['evidence_type']}")
+            continue
+        if low in ("/agents", "agents"):
+            print("  deterministic specialist agents live inside the SynGlue graph:")
+            print("  Supervisor · Planner · Target · Binder · Warhead · E3 · Exit Vector · Linker ·")
+            print("  Construction · Ternary · ADMET · Prediction · Cell Context · Ranking · Report")
+            continue
+        if low.startswith("/run "):
+            line = "Design: " + line[5:].strip()
+        text = line
         print("")
-        answer = cc.stream_text(history, cfg=cfg, on_delta=lambda d: print(d, end="", flush=True))
-        print("\n")
-        history.append({"role": "assistant", "content": answer})
-        if len(history) > 40:
-            history = history[:1] + history[-18:]
+        try:
+            run = agent.turn(text, ask=input)
+        except ClarificationNeeded as need:
+            print("\nACTION REQUIRED — " + need.question)
+            continue
+        finish(run)
 
 
 def build_parser() -> argparse.ArgumentParser:
