@@ -6,7 +6,7 @@
  * Adapted for PROTACXtend scientific UI.
  */
 
-import { createTheme, RESET, BOLD, DIM, rgb, type Theme } from "./theme.js";
+import { createTheme, RESET, BOLD, DIM, rgb, bgRgb, lerpColor, type Theme } from "./theme.js";
 
 const theme = createTheme();
 
@@ -53,6 +53,34 @@ export function centerText(text: string, width: number): string {
   if (w >= width) return text;
   const left = Math.floor((width - w) / 2);
   return " ".repeat(left) + text + " ".repeat(width - w - left);
+}
+
+/** Right-align a string to a width (ANSI aware). */
+export function padLeft(text: string, width: number): string {
+  const w = visibleWidth(text);
+  if (w >= width) return text;
+  return " ".repeat(width - w) + text;
+}
+
+/**
+ * True-color horizontal gradient strip (one character row tall).
+ * Each cell is a background-colored space, producing a smooth brand band
+ * (violet → cyan) ideal for section dividers / card caps.
+ */
+export function gradientBand(width: number, from = "#8E86E8", to = "#5AB9CD"): string {
+  const cells: string[] = [];
+  const n = Math.max(1, width);
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? 0 : i / (n - 1);
+    cells.push(`${bgRgb(lerpColor(from, to, t))} ${RESET}`);
+  }
+  return cells.join("");
+}
+
+/** Split a terminal row into a left block + right block, padded to a total width. */
+export function splitRow(left: string, right: string, width: number, gap = 3): string {
+  const lw = Math.max(0, width - visibleWidth(right) - gap);
+  return padRight(truncateToWidth(left, lw), lw) + " ".repeat(gap) + truncateToWidth(right, Math.max(0, width - lw - gap));
 }
 
 // ── Box drawing ──────────────────────────────────────────────────
@@ -128,4 +156,16 @@ export function printPanel(title: string, lines: string[] = [], width = 56): voi
 
 export function printEmptyLine(): void {
   printLine("");
+}
+
+/** Print a `label   value` info row with aligned labels (ANSI-aware). */
+export function printKv(label: string, value: string, labelWidth = 16): void {
+  printLine(`  ${theme.dim(padRight(label, labelWidth))}${value}`);
+}
+
+/** Print a bold section header separated by a dim rule. */
+export function printRuleHeader(text: string): void {
+  printLine("");
+  printLine(`  ${theme.accent(text)}`);
+  printLine(`  ${theme.dim("─".repeat(56))}`);
 }

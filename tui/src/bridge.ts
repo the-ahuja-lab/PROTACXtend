@@ -11,8 +11,23 @@ import { fileURLToPath } from "node:url";
 import { createInterface, type Interface } from "node:readline";
 import { EventEmitter } from "node:events";
 
+import { existsSync } from "node:fs";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolve(__dirname, "..", "..");
+
+// Walk up from wherever we are to find the protacpilot project root
+function findProjectRoot(): string {
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, "protacxtend", "__init__.py"))) {
+      return dir;
+    }
+    dir = resolve(dir, "..");
+  }
+  // Fallback: assume tui/ is inside protacpilot/
+  return resolve(__dirname, "..", "..");
+}
+const PROJECT_ROOT = findProjectRoot();
 
 // ── Event types ──────────────────────────────────────────────────
 
@@ -34,7 +49,7 @@ export class PythonBridge extends EventEmitter {
   start(): Promise<void> {
     return new Promise((resolveReady, reject) => {
       const python = process.env.PROTACXTEND_PYTHON ?? "python3";
-      const args = ["-m", "synglue_agent.tui_bridge.server"];
+      const args = ["-m", "protacxtend.tui_bridge.server"];
 
       this.process = spawn(python, args, {
         cwd: PROJECT_ROOT,
