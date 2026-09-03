@@ -22,7 +22,7 @@
   <nav class="navbar" id="top-navbar">
     <div class="container nav-inner">
       <a href="#home" class="nav-brand" aria-label="PROTACXtend home">
-        <span class="brand-logo"><img src="assets/logo.png" alt="PROTACXtend logo" width="40" height="40"></span>
+        <span class="brand-logo"><img src="assets/logo-mark.png" alt="PROTACXtend mark" width="420" height="217"></span>
         <span class="brand-word">PROTAC<span class="brand-accent">Xtend</span></span>
         <span class="brand-chip">v0.3 core · research</span>
       </a>
@@ -63,7 +63,7 @@
         <div class="hero-copy reveal">
           <div class="kicker">
             <span class="kicker-dot"></span>
-            AHUJA LAB · IIIT DELHI · TARGETED PROTEIN DEGRADATION
+            Ahuja Lab · IIIT Delhi · Targeted protein degradation
           </div>
 
           <h1 class="hero-title">
@@ -72,22 +72,43 @@
           </h1>
 
           <p class="hero-lede">
-            PROTACXtend connects scientific literature and biochemical databases with
-            component-aware molecular design, controlled chemical-space search,
-            ternary-complex physics, mechanistic degradation modeling, DC50/Dmax prediction
-            and cellular-context reasoning. A governed agent graph converts each research
-            objective into auditable candidate decisions with explicit provenance,
-            uncertainty, applicability-domain checks and stated limitations.
+            PROTACXtend couples scientific literature and biochemical databases with
+            component-aware molecular design and controlled chemical-space search. It then
+            models ternary-complex physics and mechanistic degradation with
+            DC<sub>50</sub>/D<sub>max</sub> prediction under cell-context reasoning — every
+            candidate decision carries explicit provenance, uncertainty and
+            applicability-domain checks.
           </p>
 
-          <div class="framework-strip reveal" aria-label="KNOW REASON DESIGN DISCOVER framework">
-            <a href="#capabilities" class="fw fw-know"><span class="fw-k">KNOW</span><span class="fw-d">evidence before inference</span></a>
-            <span class="fw-arrow">→</span>
-            <a href="#capabilities" class="fw fw-reason"><span class="fw-k">REASON</span><span class="fw-d">evidence → design decisions</span></a>
-            <span class="fw-arrow">→</span>
-            <a href="#capabilities" class="fw fw-design"><span class="fw-k">DESIGN</span><span class="fw-d">constrained molecular search</span></a>
-            <span class="fw-arrow">→</span>
-            <a href="#capabilities" class="fw fw-discover"><span class="fw-k">DISCOVER</span><span class="fw-d">converging evidence → prioritization</span></a>
+          <div class="loop-grid" aria-label="KNOW REASON DESIGN DISCOVER scientific loop">
+            <a class="loop-card loop-know" href="#capabilities">
+              <span class="loop-idx">01</span>
+              <span class="loop-body">
+                <span class="loop-title">KNOW</span>
+                <span class="loop-desc">Literature &amp; database evidence before inference</span>
+              </span>
+            </a>
+            <a class="loop-card loop-reason" href="#capabilities">
+              <span class="loop-idx">02</span>
+              <span class="loop-body">
+                <span class="loop-title">REASON</span>
+                <span class="loop-desc">Evidence into explicit design decisions</span>
+              </span>
+            </a>
+            <a class="loop-card loop-design" href="#capabilities">
+              <span class="loop-idx">03</span>
+              <span class="loop-body">
+                <span class="loop-title">DESIGN</span>
+                <span class="loop-desc">Constrained chemical &amp; structural search</span>
+              </span>
+            </a>
+            <a class="loop-card loop-discover" href="#capabilities">
+              <span class="loop-idx">04</span>
+              <span class="loop-body">
+                <span class="loop-title">DISCOVER</span>
+                <span class="loop-desc">Converging evidence into prioritization</span>
+              </span>
+            </a>
           </div>
 
           <div class="hero-ctas">
@@ -100,30 +121,131 @@
               Source code
             </a>
           </div>
-
-          <div class="install-strip reveal">
-            <span class="install-label">Install</span>
-            <div class="install-tabs" role="tablist">
-              <button class="tab-pill active" data-tool="git">git clone</button>
-              <button class="tab-pill" data-tool="docker">docker</button>
-            </div>
-            <code class="install-cmd" id="install-command">git clone https://github.com/the-ahuja-lab/PROTACXtend.git</code>
-            <button class="copy-btn" id="install-copy-btn" title="Copy command" aria-label="Copy command">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
-            <span class="install-note">Run from source — PyPI publishing on the roadmap.</span>
-          </div>
         </div>
 
         <div class="hero-side reveal">
-          <div class="hero-logo-card">
-            <img src="assets/logo.png" alt="PROTACXtend visual identity" width="1254" height="1254" loading="eager">
+          <figure class="hero-figure">
+            <div class="fig-topbar">
+              <span class="fig-dot"></span>
+              <span class="fig-dot"></span>
+              <span class="fig-dot"></span>
+              <span class="fig-title">ternary_complex / degradation_cascade — illustrative schematic</span>
+            </div>
+            <div class="fig-art">
+              <svg viewBox="0 0 560 500" role="img" aria-label="Schematic of a ternary complex: a PROTAC molecular bridge brings a target protein and an E3 ubiquitin ligase together, leading to ubiquitination and proteasomal degradation">
+                <defs>
+                  <pattern id="hgrid" width="28" height="28" patternUnits="userSpaceOnUse">
+                    <path d="M28 0H0v28" fill="none" stroke="#EDEFFA" stroke-width="1"></path>
+                  </pattern>
+                  <linearGradient id="gTarget" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#F4F2FE"></stop>
+                    <stop offset="1" stop-color="#E2DEF8"></stop>
+                  </linearGradient>
+                  <linearGradient id="gE3" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#E8F6F9"></stop>
+                    <stop offset="1" stop-color="#D0E9EF"></stop>
+                  </linearGradient>
+                  <radialGradient id="washPurple" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0" stop-color="rgba(134,131,221,0.20)"></stop>
+                    <stop offset="1" stop-color="rgba(134,131,221,0)"></stop>
+                  </radialGradient>
+                  <radialGradient id="washTeal" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0" stop-color="rgba(90,185,205,0.16)"></stop>
+                    <stop offset="1" stop-color="rgba(90,185,205,0)"></stop>
+                  </radialGradient>
+                </defs>
+
+                <rect width="560" height="500" fill="#FFFFFF"></rect>
+                <rect width="560" height="500" fill="url(#hgrid)"></rect>
+                <circle cx="500" cy="40" r="190" fill="url(#washPurple)"></circle>
+                <circle cx="70" cy="470" r="200" fill="url(#washTeal)"></circle>
+
+                <!-- ternary-complex envelope -->
+                <rect x="36" y="56" width="488" height="250" rx="26" fill="none" stroke="rgba(112,107,214,0.32)" stroke-width="1.5" stroke-dasharray="3 6"></rect>
+                <text x="280" y="296" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10" letter-spacing="1.4" fill="#4E47B2">TERNARY COMPLEX · COOPERATIVE</text>
+
+                <!-- target protein -->
+                <rect x="52" y="74" width="196" height="208" rx="62" fill="url(#gTarget)" stroke="#BDB6EC" stroke-width="1.6"></rect>
+                <ellipse cx="138" cy="122" rx="52" ry="30" fill="#FFFFFF" opacity="0.5" transform="rotate(-16 138 122)"></ellipse>
+                <text x="150" y="165" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13.5" font-weight="700" fill="#0B1338">Target protein</text>
+                <text x="150" y="184.5" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.5" letter-spacing="0.4" fill="#4E47B2">e.g. BRD4 · warhead pocket</text>
+
+                <!-- E3 ligase -->
+                <rect x="312" y="74" width="196" height="208" rx="62" fill="url(#gE3)" stroke="#8FD3DD" stroke-width="1.6"></rect>
+                <ellipse cx="422" cy="122" rx="52" ry="30" fill="#FFFFFF" opacity="0.5" transform="rotate(-16 422 122)"></ellipse>
+                <text x="410" y="165" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13.5" font-weight="700" fill="#0B1338">E3 ligase</text>
+                <text x="410" y="184.5" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.5" letter-spacing="0.4" fill="#0E6E78">e.g. CRBN · VHL · IAP</text>
+
+                <!-- binding pockets -->
+                <ellipse cx="248" cy="176" rx="15" ry="24" fill="#FFFFFF" stroke="#D4CFF4" stroke-width="1.2"></ellipse>
+                <ellipse cx="312" cy="176" rx="15" ry="24" fill="#FFFFFF" stroke="#BCE2E9" stroke-width="1.2"></ellipse>
+
+                <!-- PROTAC: warhead ring + linker + E3-ligand ring -->
+                <g stroke-linejoin="round">
+                  <polygon points="246,163 235,169.5 235,182.5 246,189 257,182.5 257,169.5" fill="#FFFFFF" stroke="#0F2280" stroke-width="2"></polygon>
+                  <circle cx="246" cy="176" r="7" fill="none" stroke="#706BD6" stroke-width="1.4"></circle>
+                  <polygon points="314,163 303,169.5 303,182.5 314,189 325,182.5 325,169.5" fill="#FFFFFF" stroke="#0E6E78" stroke-width="2"></polygon>
+                  <circle cx="314" cy="176" r="7" fill="none" stroke="#1792A2" stroke-width="1.4"></circle>
+
+                  <path d="M258 178 C 266 170 274 184 282 176 C 290 168 300 184 302 176" fill="none" stroke="#0F2280" stroke-width="2" stroke-linecap="round"></path>
+                  <circle cx="266" cy="172" r="2.2" fill="#706BD6"></circle>
+                  <circle cx="282" cy="176" r="2.2" fill="#706BD6"></circle>
+                  <circle cx="296" cy="181" r="2.2" fill="#706BD6"></circle>
+                </g>
+
+                <!-- separator + module key -->
+                <path d="M40 330 H520" stroke="#E4E7F6" stroke-width="1"></path>
+                <rect x="60" y="343" width="9" height="9" rx="2" fill="#0F2280"></rect>
+                <text x="78" y="352" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.2" letter-spacing="0.3" fill="#39405F">warhead — binder</text>
+                <rect x="196" y="343" width="9" height="9" rx="2" fill="#625CC6"></rect>
+                <text x="214" y="352" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.2" letter-spacing="0.3" fill="#39405F">linker — geometry</text>
+                <rect x="372" y="343" width="9" height="9" rx="2" fill="#1792A2"></rect>
+                <text x="390" y="352" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10.2" letter-spacing="0.3" fill="#39405F">e3 ligand — CRBN/VHL</text>
+
+                <!-- ubiquitination -> degradation -->
+                <circle cx="92" cy="418" r="7" fill="url(#gE3)" stroke="#1792A2" stroke-width="1.4"></circle>
+                <text x="92" y="421" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="7.6" font-weight="700" fill="#0E6E78">Ub</text>
+                <circle cx="118" cy="418" r="7" fill="url(#gE3)" stroke="#1792A2" stroke-width="1.4"></circle>
+                <text x="118" y="421" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="7.6" font-weight="700" fill="#0E6E78">Ub</text>
+                <circle cx="144" cy="418" r="7" fill="url(#gE3)" stroke="#1792A2" stroke-width="1.4"></circle>
+                <text x="144" y="421" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="7.6" font-weight="700" fill="#0E6E78">Ub</text>
+                <path d="M158 418 H188" stroke="#0F2280" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M182 412 L192 418 L182 424" fill="none" stroke="#0F2280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <text x="206" y="421" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#0B1338">proteasomal degradation — 26S</text>
+
+                <text x="540" y="483" text-anchor="end" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10" letter-spacing="0.4" fill="#6A7294">schematic · not to scale</text>
+              </svg>
+            </div>
+            <figcaption class="fig-caption">
+              <span class="fig-caption-tag">Fig 1</span>
+              <span class="badge eb-illu">ILLUSTRATIVE</span>
+              <span class="cap-text">Ternary assembly &amp; ubiquitination geometry — illustrative schematic; model-backed statuses are in the Validation matrix.</span>
+            </figcaption>
+          </figure>
+
+          <p class="hero-note">
+            <strong>This is a research system, not a demo</strong> — every stage runs with its own
+            tools, models and an explicit evidence type. Walkthrough values are illustrative unless
+            marked otherwise.
+          </p>
+        </div>
+      </div>
+
+      <div class="container hero-quickstart reveal">
+        <div class="quickstart-bar">
+          <span class="quickstart-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+            Quick start
+          </span>
+          <div class="install-tabs" role="tablist">
+            <button class="tab-pill active" data-tool="git">git clone</button>
+            <button class="tab-pill" data-tool="docker">docker</button>
           </div>
-          <div class="hero-flash">
-            <p><strong>This is a research system, not a demo</strong> — each stage below runs
-            with its own tools, models and an explicit evidence type. Values shown in the
-            walkthrough are illustrative unless marked otherwise.</p>
-          </div>
+          <code class="install-cmd" id="install-command">git clone https://github.com/the-ahuja-lab/PROTACXtend.git</code>
+          <button class="copy-btn" id="install-copy-btn" title="Copy command" aria-label="Copy command">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <span class="install-note">Run from source — PyPI publishing on the roadmap.</span>
         </div>
       </div>
 
@@ -785,7 +907,7 @@ protac_sm = tb.assemble_protac(warhead_smiles="...", linker_smiles="...", e3_smi
     <div class="container footer-grid">
       <div class="footer-brand">
         <a class="nav-brand" href="#home">
-          <span class="brand-logo"><img src="assets/logo.png" alt="PROTACXtend logo" width="40" height="40"></span>
+          <span class="brand-logo"><img src="assets/logo-mark.png" alt="PROTACXtend mark" width="420" height="217"></span>
           <span class="brand-word">PROTAC<span class="brand-accent">Xtend</span></span>
         </a>
         <p>An evidence-grounded autonomous research system for targeted protein degradation. KNOW → REASON → DESIGN → DISCOVER.</p>

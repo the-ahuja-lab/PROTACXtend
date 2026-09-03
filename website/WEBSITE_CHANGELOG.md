@@ -2,6 +2,37 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.3 — Impeccable-style quality pass on hero/header (2026-09-03)
+
+Ran the [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `detect` audit against the served page and fixed the actionable findings in the landing hero/header (legacy table/badge tokens in lower docs sections left untouched — they are a separate site-wide pass).
+
+- Removed `background-clip: text` gradient text from the landing UI (hero headline emphasis, DISCOVER loop title, navbar/footer wordmark “Xtend”) → solid high-contrast ink (#0F2280 / #5B4FC4; footer #BABDEE on dark).
+- AA contrast: functional purple text darkened to #5B4FC4; muted text token #6A7294 → #656E92; CTA/GitHub buttons use a darker gradient (white text now ≥5.4:1 on every stop); “Fig 1” chip background darkened.
+- Functional text ≥11px: navbar version chip, hero loop numbers, quick-start label, figure badge/caption type all raised off the sub-11px floor.
+- Figure SVG micro-type raised (protein labels, module key, ternary label, Ub/degradation labels, schematic note) and labels tightened so nothing overlaps.
+- Long all-caps hero kicker → mixed case (“Ahuja Lab · IIIT Delhi · Targeted protein degradation”).
+
+Hero findings dropped from 223 to 194; all remaining findings are in pre-existing validation-matrix/table/demo-tag tokens (9.5px badges, pipeline numbering) outside this scope.
+
+## v2.2 — hero & header polish (homepage)
+
+Presentation-only update to the above-the-fold hero (`website/index.html`, `website/styles.css`); no routing, copy-claims, or documentation structure changed.
+
+Navbar / brand
+- Logo lockup rebuilt as a single clean unit: brand device (X + molecular ring) cropped from `code/logo.png` into a transparent `assets/logo-mark.png`, shown at a legible size with the wordmark and version chip as one vertically-centred unit (removed the small white “floating tile” crop of the full square logo).
+- Footer brand uses the same mark on a white tile for dark-background legibility.
+
+Hero
+- Two-column hero: left = kicker → headline → concise description → four KNOW/REASON/DESIGN/DISCOVER capability blocks (numbered 01–04 cards with coloured top accents) → CTAs; right = full-height publication-style figure.
+- New hero figure (inline SVG, brand palette): target protein + E3 ligase bridged by a PROTAC (warhead·linker·E3 ligand), ternary-complex envelope, module key and Ub → 26S proteasomal-degradation cascade, framed by the existing “fig window” topbar + caption, tagged ILLUSTRATIVE (not a measured complex).
+- Install/quick-start command moved out of the copy column into a full-width bar between the hero grid and the stats band; hero note (“research system, not a demo”) kept under the figure.
+- Typography hierarchy tightened (title scale/leading, description rhythm, spacing between title → description → capability blocks → CTAs) so the hero is balanced instead of text-heavy.
+
+Responsive & hygiene
+- Desktop: balanced 50/50 grid; ≤1080px: stacked hero (text first, figure below, centred, capped width); small screens: capability blocks 2×2, quick-start wraps, code scrolls horizontally inside its pill.
+- Zero horizontal overflow at 320–1440px (document-root clip added; legacy `.demo-banner` tag allowed to wrap on phones; fixed replaced-element min-width so the SVG scales cleanly).
+- Removed unused `.hero-logo-card` / `.framework-strip` / `.fw*` hero styles.
+
 ## v2.0 — scientific-coherence rewrite (2026-09-02)
 
 Positioning and messaging
