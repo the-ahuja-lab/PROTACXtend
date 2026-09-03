@@ -793,6 +793,26 @@ def _runtime_command(args: argparse.Namespace) -> int:
     return print_runtime_status()
 
 
+
+def _pilot_command(args: argparse.Namespace) -> int:
+    """PROTACpilot structural workflow — registered engines run, externals block honestly."""
+    from protacxtend.workflows.pilot_runner import run_protacpilot_pipeline
+    ctx = {"target": args.target or "", "e3": args.e3 or "", "protac_smiles": args.smiles or "",
+           "objective": " ".join(args.request or [])}
+
+    def emit(evt) -> None:
+        line = f"[{evt.get('kind')}] {evt.get('stage','')} {evt.get('name')} ({evt.get('status')}) → {evt.get('summary')}"
+        print("  " + line)
+
+    result = run_protacpilot_pipeline(ctx, emit)
+    print("")
+    print(f"PROTACpilot pipeline: {result['status']}")
+    print(f"  steps executed: {len(result['results'])}")
+    if result.get("blocked_at"):
+        print(f"  blocked at: {result['blocked_at']} (external engine not configured — NOT AVAILABLE, no fabrication)")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="PROTACXtend",
@@ -901,6 +921,13 @@ def build_parser() -> argparse.ArgumentParser:
     api.add_argument("--reload", action="store_true")
     api.set_defaults(func=_api_command)
 
+    pilot = sub.add_parser("pilot", help="Run the PROTACpilot structural workflow.")
+    pilot.add_argument("request", nargs="*", help="Optional objective text (informational).")
+    pilot.add_argument("--target", default="", help="Target, e.g. BRD4")
+    pilot.add_argument("--e3", default="CRBN", help="E3 ligase, e.g. CRBN")
+    pilot.add_argument("--smiles", default="", help="PROTAC/Warhead SMILES for decomposer/conformers")
+    pilot.set_defaults(func=_pilot_command)
+
     runtime = sub.add_parser("runtime", help="Inspect the Pi runtime (status).")
     runtime.add_argument("action", nargs="?", default="status", choices=["status"])
     runtime.set_defaults(func=_runtime_command)
@@ -939,6 +966,7 @@ def main(argv: list[str] | None = None) -> int:
         "llm",
         "chat",
         "runtime",
+        "pilot",
         "design",
         "ask",
         "validate",
