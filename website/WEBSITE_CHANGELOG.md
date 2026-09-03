@@ -2,6 +2,14 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.7 — end-of-page tone pass: navy/cyan ending → single deep-violet family (2026-09-03)
+
+- CTA band (page end): replaced the navy→royal-blue gradient + cyan gradient heading with one deep-violet family (radial violet washes over #3D3690 → #2B2569 → #1B1740); heading emphasis is now solid light lavender.
+- Footer: background moved from navy-black #060A1E to deep violet #161226; column headings lavender.
+- Other dark-blue surfaces unified for consistency: hero stats band, mechanism chain and the About release card now use the same deep-violet gradient; stat numbers are solid light lavender instead of blue gradient.
+- Neutralized text inks: headings/body no longer carry a navy cast (--ink/--navy/--deep-blue moved to near-neutral charcoal and deep violet); remaining navy literals in buttons, emphasis and shadows replaced with violet equivalents.
+- No layout/overflow changes; hero artwork assets untouched.
+
 ## v2.6 — hero enlarged & decluttered (2026-09-03)
 
 - Hero restructured to a centered single-column hero: headline → lede → CTAs on top, then the **hero artwork full-width beneath it** (up to 1040px wide vs the previous ~540px half-column) so the artwork’s left/right details stay legible.
