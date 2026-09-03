@@ -2,6 +2,12 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.6 — hero enlarged & decluttered (2026-09-03)
+
+- Hero restructured to a centered single-column hero: headline → lede → CTAs on top, then the **hero artwork full-width beneath it** (up to 1040px wide vs the previous ~540px half-column) so the artwork’s left/right details stay legible.
+- Declutter: removed the tertiary “Source code” CTA (GitHub already lives in the navbar/footer) and removed the card chrome from the four KNOW/REASON/DESIGN/DISCOVER blocks — they now sit as a slim, flat capability strip under the artwork (4-across on desktop, 2×2 on smaller screens).
+- Tighter top padding and margins; hero note kept as a small centered line. No overflow/regressions at 320–1920px.
+
 ## v2.5 — hero image → AA.png + Impeccable craft/colorize/optimize/clarify/layout pass (2026-09-03)
 
 - Hero visual now uses `assets/AA.png` (1672×941, 16:9); superseded `assets/hero.png` removed.
