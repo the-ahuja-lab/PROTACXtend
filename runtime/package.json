@@ -1,0 +1,23 @@
+{
+  "name": "@protacxtend/runtime",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi runtime for PROTACXtend \u2014 persistent Python science bridge + conversational tools",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "0.84.4",
+    "@earendil-works/pi-ai": "0.84.4",
+    "@earendil-works/pi-coding-agent": "0.84.4",
+    "@earendil-works/pi-tui": "0.84.4",
+    "typebox": "^1.3.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "smoke": "node tests/bridge-smoke.mjs"
+  }
+}

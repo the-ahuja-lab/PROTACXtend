@@ -303,8 +303,12 @@ def exec_validate_smiles(smiles: str) -> ToolResult:
     from protacxtend.tools.chemistry_core import validate_smiles as _validate
     try:
         result = _validate(smiles)
-        ok = bool(getattr(result, "is_valid", result.get("valid") if isinstance(result, dict) else True))
-        payload = result.model_dump() if hasattr(result, "model_dump") else dict(result)
+        ok = bool(getattr(result, "is_valid", True))
+        try:
+            payload = result.model_dump() if hasattr(result, "model_dump") else dict(result)
+        except Exception:
+            from dataclasses import asdict
+            payload = asdict(result) if hasattr(result, "__dataclass_fields__") else {"is_valid": ok}
         return ToolResult(tool="inspect_smiles", status=ToolStatus.SUCCESS if ok else ToolStatus.WARNING,
                           summary="SMILES valid" if ok else "SMILES invalid",
                           data=payload, evidence_type=EvidenceType.CALCULATED,
