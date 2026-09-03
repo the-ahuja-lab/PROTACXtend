@@ -2,6 +2,12 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.4 — hero visual swapped to authored image (2026-09-03)
+
+- Replaced the inline SVG mechanism cartoon in the hero with the authored 16:9 hero illustration `website/assets/hero.png` (1672×941), shown cleanly on the right side of the two-column hero (rounded, subtle border/shadow; stacked + centred below the copy on ≤1080px).
+- Removed the figure “window chrome” (topbar + Fig 1 caption) around the hero image; the research note remains beneath it.
+- New stylesheet block `.hero-art`; responsive centering updated. No layout/overflow regressions at 320–1920px.
+
 ## v2.3 — Impeccable-style quality pass on hero/header (2026-09-03)
 
 Ran the [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `detect` audit against the served page and fixed the actionable findings in the landing hero/header (legacy table/badge tokens in lower docs sections left untouched — they are a separate site-wide pass).
