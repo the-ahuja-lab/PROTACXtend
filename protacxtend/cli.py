@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import importlib.util
 import json
 import subprocess
@@ -946,6 +947,10 @@ def main(argv: list[str] | None = None) -> int:
         "capabilities",
     }
     if not argv:
+        if sys.stdin.isatty() and os.environ.get("PXT_PI", "1") != "0":
+            from protacxtend.pi_launcher import resolve_pi_command, launch_pi
+            if resolve_pi_command() is not None:
+                return launch_pi()
         return _interactive_command()
     if "-p" in argv or "--print" in argv:
         mode = "agentic"
