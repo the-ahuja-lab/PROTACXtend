@@ -150,6 +150,16 @@ TOOL_SPECS: List[Dict[str, Any]] = [
           "ADMET flags (hERG/AMES/BBB/Lipinski...).", {"smiles": ""},
           EvidenceType.ML_PREDICTION, [], deterministic=True),
 
+    # WORKFLOW
+    _spec("run_protacpilot_structural", "workflow",
+          "PROTACpilot structural pipeline: KNOW target/E3/PROTAC → reference "
+          "structures → decomposition → validation → ternary (external COMPASS / "
+          "PRosettaC / PROTAC-Model) → consensus/interface/strain/cooperativity → "
+          "CRL/lysine → MD → bRo5 → fusion → rank + reproducibility report.",
+          {"target": "", "e3": "CRBN", "protac_smiles": ""}, EvidenceType.STRUCTURAL_SURROGATE,
+          ["External ternary/MD engines required for structure stages; run `protacxtend pilot`."],
+          readiness="planned"),
+
     # DECISION
     _spec("rank_candidates", "decision",
           "Pareto rank candidate records by potency/novelty/ADMET/synthesis.",
