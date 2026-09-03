@@ -25,7 +25,7 @@ User
 | # | Item | State | Notes |
 |---|------|-------|-------|
 | 1 | Pi runtime scaffold | COMPLETE | `runtime/`, typechecked vs Pi 0.84.4 |
-| 2 | Production entrypoint | COMPLETE | `PROTACXtend` → pi TUI proven in PTY (π v0.84.4 banner; ran until killed) |
+| 2 | Production entrypoint | COMPLETE | `PROTACXtend` → pi TUI proven from repo root AND `CLI/` (π v0.84.4; terminal title “π - CLI” ⇒ cwd preserved); `PROTACXtend runtime status` prints full READY report |
 | 3 | Persistent Python bridge | COMPLETE | worker JSONL ping/catalog/tool/workflow/session.* (tests) |
 | 4 | True LangGraph streaming | COMPLETE | `agents/stream.py` astream `updates+values`; node events real; tests show intermediate event before complete |
 | 5 | Persistent project/session store | COMPLETE | `state/store.py` projects/sessions/runs; save/list/resume tests incl. restart |
@@ -51,9 +51,7 @@ User
 
 ## Verified in this session (slices E–H)
 
-- **E**: `timeout 15 script … 'python -m protacxtend.cli'` → Pi TUI started
-  (π v0.84.4, repo `(main)`, model `deepseek-v4-flash • high`), stayed alive.
-  No manual `cd runtime/npm install/pi -e` needed. Unit tests cover resolve/launch routing.
+- **E**: launcher is installation-anchored (PROTACXTEND_ROOT or module location — never cwd); verifies package.json/src/index.ts, checks runtime deps (auto-install w/ PROTACXTEND_AUTO_SETUP=1 or clear npm action), execs `pi -e <absolute ext>` in the user’s cwd. Proven from repo root and `CLI/` in a PTY (π v0.84.4, stayed alive); `PROTACXtend runtime status` → READY. Tests launch from root/CLI//tmp/home.
 - **F**: `agents/stream.py` emits real `node` events via LangGraph
   `astream(stream_mode=["updates","values"])`; test proves an intermediate
   node event precedes `workflow_complete`. No timers/simulated progress.

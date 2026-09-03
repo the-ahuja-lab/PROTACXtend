@@ -787,6 +787,12 @@ def _chat_command(args: argparse.Namespace) -> int:
         finish(run)
 
 
+
+def _runtime_command(args: argparse.Namespace) -> int:
+    from protacxtend.pi_launcher import print_runtime_status
+    return print_runtime_status()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="PROTACXtend",
@@ -895,6 +901,10 @@ def build_parser() -> argparse.ArgumentParser:
     api.add_argument("--reload", action="store_true")
     api.set_defaults(func=_api_command)
 
+    runtime = sub.add_parser("runtime", help="Inspect the Pi runtime (status).")
+    runtime.add_argument("action", nargs="?", default="status", choices=["status"])
+    runtime.set_defaults(func=_runtime_command)
+
     llm = sub.add_parser("llm", help="Configure or inspect the LLM backend (API vs Ollama).")
     llm.add_argument("--setup", action="store_true", help="Interactive backend picker (API or Ollama).")
     llm.add_argument("--status", action="store_true", help="Show active backend and health.")
@@ -928,6 +938,7 @@ def main(argv: list[str] | None = None) -> int:
         "run",
         "llm",
         "chat",
+        "runtime",
         "design",
         "ask",
         "validate",
