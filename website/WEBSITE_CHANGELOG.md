@@ -2,6 +2,10 @@
 
 Log of website changes with the scientific-coherence overhaul.
 
+## v2.8 — remove the pre-footer CTA band (single footer) (2026-09-03)
+
+- Deleted the dark CTA section that sat directly above the real footer — it read as a second footer. The page now ends with the single `<footer>`.
+
 ## v2.7 — end-of-page tone pass: navy/cyan ending → single deep-violet family (2026-09-03)
 
 - CTA band (page end): replaced the navy→royal-blue gradient + cyan gradient heading with one deep-violet family (radial violet washes over #3D3690 → #2B2569 → #1B1740); heading emphasis is now solid light lavender.
